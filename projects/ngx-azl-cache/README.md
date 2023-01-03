@@ -4,10 +4,10 @@ This library provides a backend data cache store for angular frontend applicatio
 
 ## Dependencies
 
-| @azlabsjs/ngx-azl-cache | @azlabsjs/ngx-query | @azlabsjs/rx-query | Angular |
-|------------------------ | ------------------- | ------------------ | ------- |
-|^0.13.X                  | ^0.1.x              | ^0.1.x             | ^13.0   |
-|^0.13.X                  | ^0.1.x              | ^0.1.x             | ^14.0   |
+| @azlabsjs/ngx-azl-cache | @azlabsjs/ngx-query  | @azlabsjs/rx-query | Angular |
+|------------------------ | -------------------  | ------------------ | ------- |
+|^0.13.x                  | ^0.13.x              | ^0.1.x             | ^13.0   |
+|^0.13.x                  | ^0.14.x              | ^0.1.x             | ^14.0   |
 
 ## Usage
 
