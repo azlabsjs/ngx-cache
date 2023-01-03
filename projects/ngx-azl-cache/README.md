@@ -2,6 +2,13 @@
 
 This library provides a backend data cache store for angular frontend application. It allows developpers to preload into cache collection of data that might be required by the frontend application to function properly. Using `@azlabsjs/ngx-query` library internally it refetch on a pre-defined interval the data fetched from the backend store, making the cached data up-to-date with backend store collections.
 
+## Dependencies
+
+| @azlabsjs/ngx-azl-cache | @azlabsjs/ngx-query | @azlabsjs/rx-query | Angular |
+|------------------------ | ------------------- | ------------------ | ------- |
+|^0.13.X                  | ^0.1.x              | ^0.1.x             | ^13.0   |
+|^0.13.X                  | ^0.1.x              | ^0.1.x             | ^14.0   |
+
 ## Usage
 
 At the root of your angular application, import the library module with the required configurations:
