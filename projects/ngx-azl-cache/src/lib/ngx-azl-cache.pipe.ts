@@ -2,6 +2,7 @@ import {
   ChangeDetectorRef,
   Injectable,
   OnDestroy,
+  Optional,
   Pipe,
   PipeTransform
 } from '@angular/core';
@@ -24,7 +25,10 @@ export class AzlCachePipe implements PipeTransform, OnDestroy {
   /**
    * Creates a new {@see AzlDbValuePipe} pipe instance
    */
-  constructor(private provider: AzlCacheProvider, ref: ChangeDetectorRef) {
+  constructor(
+    ref: ChangeDetectorRef,
+    @Optional() private provider?: AzlCacheProvider
+  ) {
     // Assign `ref` into `this._ref` manually instead of declaring `_ref` in the constructor
     // parameter list, as the type of `this._ref` includes `null` unlike the type of `ref`.
     this._ref = ref;
@@ -78,7 +82,7 @@ export class AzlCachePipe implements PipeTransform, OnDestroy {
       // value is being updated.
       this._ref!.markForCheck();
     };
-    this.provider.state$
+    this.provider?.state$
       .pipe(
         map((state) => {
           if (
