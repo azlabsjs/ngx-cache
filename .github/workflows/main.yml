@@ -33,7 +33,7 @@ jobs:
       - name: Build components
         run: npm run build
 
-      - name: Publish ngx-dropzone
+      - name: Publish library
         run: cd dist/ngx-azl-cache && npm publish --access public
     env:
       NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
