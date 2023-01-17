@@ -133,9 +133,7 @@ export class AzlCachePipe implements PipeTransform, OnDestroy {
     }
     // if we ask another time for the same key, return the last value
     const searchkey = this.createSearchKey(_query, name);
-    console.log('Result: ', searchkey, this.result?.get(searchkey));
     if (this.exists(searchkey, [name, key, label])) {
-      console.log('Key: ', searchkey, 'exists');
       return this.result?.get(searchkey)?.value ?? '';
     }
     this.updateResult(_query, name, key, label);

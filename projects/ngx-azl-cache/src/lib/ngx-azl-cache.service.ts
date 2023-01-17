@@ -150,7 +150,6 @@ export class AzlCacheProvider implements AzlCacheProviderType, OnDestroy {
    */
   createResponseCallback(key: string) {
     return (items: Record<string, unknown>[], partial: boolean) => {
-      console.log('Updating cache...');
       const cache = this._state$.getValue();
       if (partial && cache.has(key) && (cache.get(key) ?? []).length !== 0) {
         return;
