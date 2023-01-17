@@ -40,10 +40,13 @@ export class AzlCachePipe implements PipeTransform, OnDestroy {
    * parameters values
    */
   private exists(searchkey: string, params: string[]) {
-    if (!this.result?.has(searchkey)) {
+    if (typeof this.result === 'undefined' || this.result === null) {
       return false;
     }
-    const lastparams = this.result?.get(searchkey)?.lastparams ?? [];
+    if (!this.result.has(searchkey)) {
+      return false;
+    }
+    const lastparams = this.result.get(searchkey)?.lastparams ?? [];
     let exists = true;
     for (let index = 0; index < params.length; index++) {
       if (lastparams[index] !== params[index]) {
@@ -73,10 +76,12 @@ export class AzlCachePipe implements PipeTransform, OnDestroy {
   ) {
     let onResult = (res: string) => {
       if (res !== undefined && res !== null) {
-        this.result?.set(this.createSearchKey(query, name), {
-          value: res,
-          lastparams: [name, key, label],
-        });
+        if (this.result) {
+          this.result = this.result.set(this.createSearchKey(query, name), {
+            value: res,
+            lastparams: [name, key, label],
+          });
+        }
       }
       // Note: `this._ref` is only cleared in `ngOnDestroy` so is known to be available when a
       // value is being updated.
