@@ -6,8 +6,39 @@ import {
   Pipe,
   PipeTransform
 } from '@angular/core';
-import { map, Subject, takeUntil, tap } from 'rxjs';
+import { distinctUntilChanged, Subject, takeUntil, tap } from 'rxjs';
 import { AzlCacheProvider } from './ngx-azl-cache.service';
+
+function querycachedvalue(
+  query: string,
+  name: string,
+  key: string,
+  label: string
+) {
+  return (state: Map<string, Record<string, unknown>[]>) => {
+    if (
+      typeof query === 'undefined' ||
+      query === null ||
+      !String(query).length
+    ) {
+      throw new Error(`"value" parameter required`);
+    }
+    if (typeof name === 'undefined' || name === null || !String(name).length) {
+      throw new Error(`"name" parameter required`);
+    }
+    let result = '';
+    const _result = state.get(name);
+    if (typeof _result !== 'undefined' && _result !== null) {
+      const _value = _result.find((s) => {
+        return String(s[key]) === String(query);
+      });
+      if (_value) {
+        result = (_value[label] as string) ?? '';
+      }
+    }
+    return result;
+  };
+}
 
 @Pipe({
   name: 'azlcache',
@@ -20,6 +51,7 @@ export class AzlCachePipe implements PipeTransform, OnDestroy {
     new Map();
   private _destroy$ = new Subject<void>();
   private _ref: ChangeDetectorRef | null;
+  private _cache!: Map<string, Record<string, unknown>[]>;
   // #endregion Class properties
 
   /**
@@ -32,6 +64,15 @@ export class AzlCachePipe implements PipeTransform, OnDestroy {
     // Assign `ref` into `this._ref` manually instead of declaring `_ref` in the constructor
     // parameter list, as the type of `this._ref` includes `null` unlike the type of `ref`.
     this._ref = ref;
+    // Subscribe to the cache state and set the _cache property of the pipe
+    this.provider?.state$
+      .pipe(
+        distinctUntilChanged(),
+        tap((state) => (this._cache = state)),
+        tap(() => this._ref?.markForCheck()),
+        takeUntil(this._destroy$)
+      )
+      .subscribe();
   }
 
   //
@@ -87,39 +128,17 @@ export class AzlCachePipe implements PipeTransform, OnDestroy {
       // value is being updated.
       this._ref!.markForCheck();
     };
-    this.provider?.state$
-      .pipe(
-        map((state) => {
-          if (
-            typeof query === 'undefined' ||
-            query === null ||
-            !String(query).length
-          ) {
-            throw new Error(`"value" parameter required`);
-          }
-          if (
-            typeof name === 'undefined' ||
-            name === null ||
-            !String(name).length
-          ) {
-            throw new Error(`"name" parameter required`);
-          }
-          let result = '';
-          const _result = state.get(name);
-          if (typeof _result !== 'undefined' && _result !== null) {
-            const _value = _result.find((s) => {
-              return String(s[key]) === String(query);
-            });
-            if (_value) {
-              result = (_value[label] as string) ?? '';
-            }
-          }
-          return result;
-        }),
-        tap(onResult),
-        takeUntil(this._destroy$)
-      )
-      .subscribe();
+    // TODO: Remove the code below if the pipe synchronizes as expected
+    // this.provider?.state$
+    // .pipe(
+    //   map(querycachedvalue(query, name, key, label)),
+    //   tap(onResult),
+    //   takeUntil(this._destroy$)
+    // )
+    // .subscribe();
+    onResult(
+      querycachedvalue(query, name, key, label)(this._cache ?? new Map())
+    );
   }
 
   /**
