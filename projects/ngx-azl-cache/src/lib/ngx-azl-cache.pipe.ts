@@ -160,8 +160,9 @@ export class AzlCachePipe implements PipeTransform, OnDestroy {
     if (this.exists(searchkey, [name, key, label])) {
       return this.result?.get(searchkey)?.value ?? '';
     }
+    // Update the internal state of the query search result
     this.updateResult(_query, name, key, label);
-    return '';
+    return this.result?.get(searchkey)?.value ?? '';
   }
 
   /**
