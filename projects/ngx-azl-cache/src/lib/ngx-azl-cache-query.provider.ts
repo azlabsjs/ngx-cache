@@ -11,7 +11,9 @@ import {
   queryPaginationate
 } from './ngx-azl-cache-query.helpers';
 import {
-  AzlCacheProviderConfigType, AzlCacheQueryProviderType, AZL_CACHE_PROVIDER_CONFIG,
+  AzlCacheProviderConfigType,
+  AzlCacheQueryProviderType,
+  AZL_CACHE_PROVIDER_CONFIG,
   PageResult,
   QueryCacheConfigType,
   ResponseInterceptorType
@@ -36,7 +38,8 @@ export class RESTQueryProvider implements AzlCacheQueryProviderType {
     this._cacheConfig = {
       observe: 'body',
       name: RESTQueryProvider.cacheConfigNamePrefix,
-      refetchInterval: DEFAULT_QUERY_REFECTH_INTERVAL,
+      refetchInterval:
+        this.config.refetchInterval ?? DEFAULT_QUERY_REFECTH_INTERVAL,
     };
   }
 
@@ -54,8 +57,11 @@ export class RESTQueryProvider implements AzlCacheQueryProviderType {
     return this;
   }
 
-  copy() {
-    return new RESTQueryProvider(this.http, this.config);
+  copy(config?: Partial<AzlCacheProviderConfigType>) {
+    return new RESTQueryProvider(this.http, {
+      ...(this.config ?? defaultConfigs),
+      ...(config ?? {}),
+    });
   }
 
   /**

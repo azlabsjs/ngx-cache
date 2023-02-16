@@ -42,7 +42,7 @@ export type AzlCacheQueryProviderType = QueryProviderType<
   /**
    * Creates a copy of the {@see AzlCacheQueryProviderType} instance
    */
-  copy(): AzlCacheQueryProviderType;
+  copy(config?: Partial<AzlCacheProviderConfigType>): AzlCacheQueryProviderType;
 };
 
 /**
@@ -56,10 +56,36 @@ export type ResponseInterceptorType = <T extends any>(
  * Provides module configuration type
  */
 export type AzlCacheProviderConfigType = {
+  /**
+   * Enables debugging flags on the library/module. While in debug mode, any changes of the cache
+   * is console logged in the application environment standard output
+   */
   debug: boolean;
+  /**
+   * Configures the max size of a slice chunk while fetching data to cache
+   */
   chunkSize?: number;
+  /**
+   * Configure how long or the interval between the load of a chunk and the next chunk
+   */
   queryInterval?: number;
+  /**
+   * **Note**
+   * Cached values are refetch at the background while the application is running. This property allow
+   * developper to configure the ttl of the cached values. This can be modified for each slice using the
+   * `cacheConfig` property
+   */
+  refetchInterval?: number;
+
+  /**
+   * Provides an interceptor for request response object
+   */
   responseInterceptor?: ResponseInterceptorType;
+
+  /***
+   * Provides configuration for pagination request. It mainly use is to configure the `per_page` parameter 
+   * of a pagination query
+   */
   pagination?: {
     perPage: number;
   };

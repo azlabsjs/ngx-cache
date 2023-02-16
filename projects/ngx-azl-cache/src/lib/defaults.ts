@@ -30,6 +30,7 @@ export const defaultConfigs: AzlCacheProviderConfigType = {
   debug: false,
   chunkSize: CHUNK_SIZE_LIMIT,
   queryInterval: QUERY_INTERVAL,
+  refetchInterval: DEFAULT_QUERY_REFECTH_INTERVAL,
   responseInterceptor: defaultResponseInterceptor,
   // By default, when paginating we load 500 values per page
   pagination: {
