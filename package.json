@@ -19,7 +19,7 @@
     "@angular/platform-browser-dynamic": "^14.2.12",
     "@angular/router": "^14.2.12",
     "@azlabsjs/ngx-query": "^0.14.1",
-    "@azlabsjs/rx-query": "^0.1.6",
+    "@azlabsjs/rx-query": "^0.2.0",
     "rxjs": "^7.5.0",
     "tslib": "^2.3.0",
     "zone.js": "^0.11.4"
