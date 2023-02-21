@@ -5,8 +5,8 @@
     "@angular/common": "^13.3",
     "@angular/core": "^13.3",
     "@angular/router": "^13.3",
-    "@azlabsjs/ngx-query": "^0.13.5",
-    "@azlabsjs/rx-query": "^0.1.6"
+    "@azlabsjs/ngx-query": "^0.13.6",
+    "@azlabsjs/rx-query": "^0.2.0"
   },
   "dependencies": {
     "tslib": "^2.3.0"
