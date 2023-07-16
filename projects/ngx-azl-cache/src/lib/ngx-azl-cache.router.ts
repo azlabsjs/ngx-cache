@@ -3,7 +3,7 @@ import {
   Injectable,
   Injector,
   OnDestroy,
-  Optional
+  Optional,
 } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import {
@@ -12,11 +12,12 @@ import {
   ObservableInput,
   Subject,
   takeUntil,
-  tap
+  tap,
 } from 'rxjs';
 import { defaultConfigs } from './defaults';
 import { AzlCacheProvider } from './ngx-azl-cache.service';
-import { AzlCacheProviderConfigType, AZL_CACHE_PROVIDER_CONFIG } from './types';
+import { AzlCacheProviderConfigType } from './types';
+import { AZL_CACHE_PROVIDER_CONFIG } from './tokens';
 
 @Injectable()
 export class AzlCacheRouter implements OnDestroy {
@@ -63,7 +64,7 @@ export class AzlCacheRouter implements OnDestroy {
             const _event = event as NavigationEnd;
             const url = _event.urlAfterRedirects;
             if (slices) {
-              for (let path of Object.keys(slices)) {
+              for (const path of Object.keys(slices)) {
                 if (this._cache?.has(path)) {
                   continue;
                 }

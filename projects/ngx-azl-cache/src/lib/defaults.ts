@@ -17,16 +17,17 @@ export const DEFAULT_QUERY_REFECTH_INTERVAL = 300000;
 
 /**
  * @internal
+ *
  * Default response interceptor used by the azl cache provider
  */
-export const defaultResponseInterceptor = (response: any) =>
+export const defaultResponseInterceptor = (response: Record<string, unknown>) =>
   response['data'] ?? response;
 
 /**
  * @internal
  * Default values of the azl cache configuration
  */
-export const defaultConfigs: AzlCacheProviderConfigType = {
+export const defaultConfigs = {
   debug: false,
   chunkSize: CHUNK_SIZE_LIMIT,
   queryInterval: QUERY_INTERVAL,
@@ -38,4 +39,4 @@ export const defaultConfigs: AzlCacheProviderConfigType = {
   router: {
     autoload: false,
   },
-};
+} as AzlCacheProviderConfigType;

@@ -3,7 +3,7 @@ import {
   Injectable,
   Injector,
   OnDestroy,
-  Optional
+  Optional,
 } from '@angular/core';
 import { useQuery } from '@azlabsjs/ngx-query';
 import {
@@ -13,17 +13,17 @@ import {
   mergeMap,
   Subject,
   take,
-  takeUntil
+  takeUntil,
 } from 'rxjs';
 import { CHUNK_SIZE_LIMIT, defaultConfigs, QUERY_INTERVAL } from './defaults';
 import {
   AzlCacheProviderConfigType,
   AzlCacheProviderType,
-  AZL_CACHE_PROVIDER_CONFIG,
-  AZL_CACHE_QUERY_CLIENT,
   QueryConfigType,
-  SliceQueryType
+  SliceQueryType,
 } from './types';
+
+import { AZL_CACHE_PROVIDER_CONFIG, AZL_CACHE_QUERY_CLIENT } from './tokens';
 
 @Injectable()
 export class AzlCacheProvider implements AzlCacheProviderType, OnDestroy {

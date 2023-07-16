@@ -30,8 +30,8 @@ export const createPaginationChunk = (
 /**
  * @internal
  */
-export const queryPaginationate = (
-  queryFunc: (page: number) => Observable<Record<string, unknown>[]>,
+export const queryPaginationate = <T = unknown>(
+  queryFunc: (page: number) => Observable<T[]>,
   total: number,
   perPage: number,
   chunkSize: number,

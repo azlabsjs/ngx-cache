@@ -1,7 +1,7 @@
-import { InjectionToken, Injector } from "@angular/core";
-import { ObserveKeyType } from "@azlabsjs/ngx-query";
-import { CacheQueryConfig, QueryProviderType } from "@azlabsjs/rx-query";
-import { Observable } from "rxjs";
+import { Injector } from '@angular/core';
+import { ObserveKeyType } from '@azlabsjs/ngx-query';
+import { CacheQueryConfig, QueryProviderType } from '@azlabsjs/rx-query';
+import { Observable } from 'rxjs';
 
 /**
  * @internal
@@ -37,7 +37,9 @@ export type AzlCacheQueryProviderType = QueryProviderType<
   /**
    * Provides {@property cacheConfig} property setter implementation
    */
-  setCacheConfig(state: Partial<QueryCacheConfigType>): AzlCacheQueryProviderType;
+  setCacheConfig(
+    state: Partial<QueryCacheConfigType>
+  ): AzlCacheQueryProviderType;
 
   /**
    * Creates a copy of the {@see AzlCacheQueryProviderType} instance
@@ -48,7 +50,7 @@ export type AzlCacheQueryProviderType = QueryProviderType<
 /**
  * @internal
  */
-export type ResponseInterceptorType = <T extends any>(
+export type ResponseInterceptorType = <T>(
   response: T
 ) => Record<string, unknown>[];
 
@@ -70,15 +72,6 @@ export type AzlCacheProviderConfigType = {
       | ((injector: Injector) => { [k: string]: SliceQueryType });
   };
 };
-
-export const AZL_CACHE_QUERY_CLIENT = new InjectionToken<AzlCacheQueryProviderType>(
-  "Azl cache query provider type"
-);
-
-export const AZL_CACHE_PROVIDER_CONFIG =
-  new InjectionToken<AzlCacheProviderConfigType>(
-    "Provides Azl cache provider configuration values"
-  );
 
 export type QueryConfigType = {
   key: string;
@@ -117,7 +110,7 @@ export interface AzlCacheProviderType {
   loadSlice(query: SliceQueryType): void;
 }
 
-export type PageResult<T = any> = {
+export type PageResult<T = unknown> = {
   total: number;
   data: T[];
   lastPage?: number;

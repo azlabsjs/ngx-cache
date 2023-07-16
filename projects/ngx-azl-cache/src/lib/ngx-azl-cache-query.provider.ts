@@ -4,18 +4,20 @@ import { map, mergeMap, Observable, of, tap } from 'rxjs';
 import {
   CHUNK_SIZE_LIMIT,
   defaultConfigs,
-  DEFAULT_QUERY_REFECTH_INTERVAL
+  DEFAULT_QUERY_REFECTH_INTERVAL,
 } from './defaults';
 import {
   createPaginationChunk,
-  queryPaginationate
+  queryPaginationate,
 } from './ngx-azl-cache-query.helpers';
 import {
-  AzlCacheProviderConfigType, AzlCacheQueryProviderType, AZL_CACHE_PROVIDER_CONFIG,
+  AzlCacheProviderConfigType,
+  AzlCacheQueryProviderType,
   PageResult,
   QueryCacheConfigType,
-  ResponseInterceptorType
+  ResponseInterceptorType,
 } from './types';
+import { AZL_CACHE_PROVIDER_CONFIG } from './tokens';
 
 @Injectable()
 export class RESTQueryProvider implements AzlCacheQueryProviderType {
@@ -83,10 +85,11 @@ export class RESTQueryProvider implements AzlCacheQueryProviderType {
       this.prepareForPagination(endpoint, 1),
       params
     ).pipe(
-      mergeMap((response: PageResult) => {
+      mergeMap((response: PageResult<Record<string, unknown>>) => {
         // First pagination chunk
         const items = (
-          responseInterceptor ?? ((response: PageResult) => response.data)
+          responseInterceptor ??
+          ((response: PageResult<Record<string, unknown>>) => response.data)
         )(response);
         // When the first page of data is loaded, we call the callback function
         // with the loaded data with the partial flag turns on
@@ -99,18 +102,20 @@ export class RESTQueryProvider implements AzlCacheQueryProviderType {
           // is not greater than the length of the list of query result items
           Number(response.total) > items.length
         ) {
-          return queryPaginationate(
-            (page) =>
-              this.sendRequest(
-                method,
-                this.prepareForPagination(endpoint, page),
-                params
-              ).pipe(
-                map(
-                  responseInterceptor ??
-                    ((response: PageResult) => response.data)
-                )
-              ),
+          const queryFunc$ = (page: number) =>
+            this.sendRequest(
+              method,
+              this.prepareForPagination(endpoint, page),
+              params
+            ).pipe(
+              map(
+                responseInterceptor ??
+                  ((response: PageResult<Record<string, unknown>>) =>
+                    response.data)
+              )
+            );
+          return queryPaginationate<Record<string, unknown>>(
+            queryFunc$,
             response.total,
             this.config.pagination?.perPage ??
               defaultConfigs.pagination?.perPage ??
@@ -123,7 +128,7 @@ export class RESTQueryProvider implements AzlCacheQueryProviderType {
             // When the pagination data is completed loading, we fetch call the callback
             // with result items, and the partial flag turned off
             tap((state) => callback([...items, ...state.flat()], false)),
-            map((_) => true)
+            map(() => true)
           );
         }
         return of(true);
@@ -164,6 +169,6 @@ export class RESTQueryProvider implements AzlCacheQueryProviderType {
     return this.http.request(method, endpoint, {
       params: new HttpParams({ fromObject: params }),
       responseType: 'json',
-    }) as Observable<PageResult>;
+    }) as Observable<PageResult<Record<string, unknown>>>;
   }
 }

@@ -6,11 +6,8 @@ import { RESTQueryProvider } from './ngx-azl-cache-query.provider';
 import { AzlCachePipe } from './ngx-azl-cache.pipe';
 import { AzlCacheRouter } from './ngx-azl-cache.router';
 import { AzlCacheProvider } from './ngx-azl-cache.service';
-import {
-  AzlCacheProviderConfigType,
-  AZL_CACHE_PROVIDER_CONFIG,
-  AZL_CACHE_QUERY_CLIENT
-} from './types';
+import { AzlCacheProviderConfigType } from './types';
+import { AZL_CACHE_PROVIDER_CONFIG, AZL_CACHE_QUERY_CLIENT } from './tokens';
 
 @NgModule({
   imports: [CommonModule],

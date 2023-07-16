@@ -6,11 +6,9 @@ export {
   AzlCacheProviderConfigType,
   AzlCacheProviderType,
   AzlCacheQueryProviderType,
-  AZL_CACHE_PROVIDER_CONFIG,
-  AZL_CACHE_QUERY_CLIENT,
   PageResult,
   QueryConfigType,
   ResponseInterceptorType,
-  SliceQueryType
+  SliceQueryType,
 } from './types';
-
+export { AZL_CACHE_PROVIDER_CONFIG, AZL_CACHE_QUERY_CLIENT } from './tokens';

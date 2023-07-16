@@ -4,7 +4,7 @@ import {
   OnDestroy,
   Optional,
   Pipe,
-  PipeTransform
+  PipeTransform,
 } from '@angular/core';
 import { map, Subject, takeUntil, tap } from 'rxjs';
 import { AzlCacheProvider } from './ngx-azl-cache.service';
@@ -68,10 +68,10 @@ export class AzlCachePipe implements PipeTransform, OnDestroy {
   private updateResult(
     query: string,
     name: string,
-    key: string = 'id',
-    label: string = 'label'
+    key = 'id',
+    label = 'label'
   ) {
-    let onResult = (res: string) => {
+    const onResult = (res: string) => {
       if (res !== undefined && res !== null) {
         this.result?.set(this.createSearchKey(query, name), {
           value: res,
@@ -80,7 +80,7 @@ export class AzlCachePipe implements PipeTransform, OnDestroy {
       }
       // Note: `this._ref` is only cleared in `ngOnDestroy` so is known to be available when a
       // value is being updated.
-      this._ref!.markForCheck();
+      this._ref?.markForCheck();
     };
     this.provider.state$
       .pipe(
@@ -121,12 +121,7 @@ export class AzlCachePipe implements PipeTransform, OnDestroy {
    * Transform user provided query value and return
    * the corresponding label from the db provider
    */
-  transform(
-    query: string | number,
-    name: string,
-    key: string = 'id',
-    label: string = 'label'
-  ) {
+  transform(query: string | number, name: string, key = 'id', label = 'label') {
     const _query = String(query);
     if (!_query || !_query.length) {
       return _query;
