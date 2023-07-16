@@ -12,4 +12,4 @@ cwd=($(pwd))
 
 tag=$(npm version $version)
 git commit -a -m "version $tag release"
-git push origin && git push origin $tag
+# git push origin && git push origin $tag
