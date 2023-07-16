@@ -2,11 +2,10 @@
   "name": "@azlabsjs/ngx-azl-cache",
   "version": "0.14.5",
   "peerDependencies": {
-    "@angular/common": "^14.2",
-    "@angular/core": "^14.2",
-    "@angular/router": "^14.2",
-    "@azlabsjs/ngx-query": "^0.14.0",
-    "@azlabsjs/rx-query": "^0.2.0"
+    "@angular/common": "^15.2",
+    "@angular/core": "^15.2",
+    "@angular/router": "^15.2",
+    "@azlabsjs/ngx-query": "^0.15.0"
   },
   "dependencies": {
     "tslib": "^2.3.0"
