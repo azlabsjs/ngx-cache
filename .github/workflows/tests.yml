@@ -1,0 +1,43 @@
+
+name: Lint & Test
+
+on:
+  push:
+    branches: [master, v15]
+  pull_request:
+    branches: [master, v15]
+
+jobs:
+  build:
+    name: Build, lint, and test on Node ${{ matrix.node }} and ${{ matrix.os }}
+
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        node: ['16.x', '18.x']
+        os: [ubuntu-latest, windows-latest]
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Use Node ${{ matrix.node }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: Check npm version
+        run: npm -v
+
+      - name: Install deps and build (with cache)
+        uses: bahmutov/npm-install@v1
+        with:
+          useLockFile: false
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Test
+        run: npm run ci:test
+    env:
+      NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}

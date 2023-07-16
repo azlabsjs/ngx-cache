@@ -6,7 +6,9 @@
     "start": "ng serve",
     "build": "ng build --configuration production ngx-azl-cache",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "lint": "ng lint",
+    "ci:test": "ng test --browsers=ChromeHeadless --watch=false --code-coverage"
   },
   "private": true,
   "dependencies": {
@@ -18,7 +20,7 @@
     "@angular/platform-browser": "^15.2.9",
     "@angular/platform-browser-dynamic": "^15.2.9",
     "@angular/router": "^15.2.9",
-    "@azlabsjs/ngx-query": "^0.14.1",
+    "@azlabsjs/ngx-query": "^0.15.0",
     "@azlabsjs/rx-query": "^0.2.0",
     "rxjs": "^7.5.0",
     "tslib": "^2.3.0",
@@ -26,10 +28,18 @@
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^15.2.9",
+    "@angular-eslint/builder": "15.2.1",
+    "@angular-eslint/eslint-plugin": "15.2.1",
+    "@angular-eslint/eslint-plugin-template": "15.2.1",
+    "@angular-eslint/schematics": "15.2.1",
+    "@angular-eslint/template-parser": "15.2.1",
     "@angular/cli": "^15.2.9",
     "@angular/compiler-cli": "^15.2.9",
     "@types/jasmine": "^3.10.0",
     "@types/node": "^12.11.1",
+    "@typescript-eslint/eslint-plugin": "5.48.2",
+    "@typescript-eslint/parser": "5.48.2",
+    "eslint": "^8.33.0",
     "jasmine-core": "^4.0.0",
     "karma": "^6.3.0",
     "karma-chrome-launcher": "^3.1.0",
