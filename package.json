@@ -20,6 +20,7 @@
     "@angular/platform-browser": "^15.2.9",
     "@angular/platform-browser-dynamic": "^15.2.9",
     "@angular/router": "^15.2.9",
+    "@azlabsjs/js-object": "^0.1.11",
     "@azlabsjs/ngx-query": "^0.15.0",
     "@azlabsjs/rx-query": "^0.2.0",
     "rxjs": "^7.5.0",

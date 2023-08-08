@@ -1,3 +1,4 @@
+import { getObjectProperty } from '@azlabsjs/js-object';
 import { CacheProviderType, QueryConfigType } from './types';
 
 /**
@@ -24,12 +25,12 @@ export function templateFactory(template: string | string[]) {
               return curr;
             }
             const property = curr.replace('{', '').replace('}', '').trim();
-            return (record[property] as string) ?? curr;
+            return (getObjectProperty(record, property) as string) ?? curr;
           })
           .join('')
           .trim()
       : template
-          .map((l) => record[l] ?? '')
+          .map((l) => getObjectProperty(record, l) ?? '')
           .join(' ')
           .trim();
   };
