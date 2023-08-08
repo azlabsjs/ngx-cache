@@ -11,7 +11,7 @@ import {
   Output,
   ViewContainerRef,
 } from '@angular/core';
-import { AzlCacheProvider } from './ngx-azl-cache.service';
+import { CacheProvider } from './ngx-azl-cache.service';
 import { Subscription, distinctUntilChanged, filter, map, tap } from 'rxjs';
 import { DOCUMENT } from '@angular/common';
 import { templateFactory } from './helpers';
@@ -20,7 +20,7 @@ import { templateFactory } from './helpers';
   // eslint-disable-next-line @angular-eslint/directive-selector
   selector: '[azlCache]',
 })
-export class AzlCacheDirective implements AfterViewInit, OnDestroy {
+export class CacheDirective implements AfterViewInit, OnDestroy {
   // #region Directive inputs
   @Input('azlCache') key!: string;
   @Input() query!: string;
@@ -42,7 +42,7 @@ export class AzlCacheDirective implements AfterViewInit, OnDestroy {
     private ref: ViewContainerRef,
     private changes: ChangeDetectorRef,
     @Inject(DOCUMENT) private document?: Document,
-    @Optional() private provider?: AzlCacheProvider
+    @Optional() private provider?: CacheProvider
   ) {
     const _subscription = this.provider?.state$
       .pipe(

@@ -1,14 +1,16 @@
 export { sliceQueryfactory } from './helpers';
 export { NgxAzlCacheModule } from './ngx-azl-cache.module';
-export { AzlCachePipe } from './ngx-azl-cache.pipe';
-export { AzlCacheProvider } from './ngx-azl-cache.service';
+export { CachePipe } from './ngx-azl-cache.pipe';
+export { CacheProvider } from './ngx-azl-cache.service';
+export { CacheDirective } from './ngx-azl-cache.directive';
 export {
-  AzlCacheProviderConfigType,
-  AzlCacheProviderType,
-  AzlCacheQueryProviderType,
+  ProviderConfigType,
+  CacheProviderType,
+  CacheQueryProviderType,
   PageResult,
   QueryConfigType,
   ResponseInterceptorType,
   SliceQueryType,
+  RequestConfigs,
 } from './types';
 export { AZL_CACHE_PROVIDER_CONFIG, AZL_CACHE_QUERY_CLIENT } from './tokens';

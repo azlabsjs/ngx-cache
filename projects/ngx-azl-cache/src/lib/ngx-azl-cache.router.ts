@@ -15,16 +15,16 @@ import {
   tap,
 } from 'rxjs';
 import { defaultConfigs } from './defaults';
-import { AzlCacheProvider } from './ngx-azl-cache.service';
-import { AzlCacheProviderConfigType, QueryConfigType } from './types';
+import { CacheProvider } from './ngx-azl-cache.service';
+import { ProviderConfigType, QueryConfigType } from './types';
 import { AZL_CACHE_PROVIDER_CONFIG } from './tokens';
 
 @Injectable()
-export class AzlCacheRouter implements OnDestroy {
+export class CacheRouter implements OnDestroy {
   //#region Class properties
   private readonly _destroy$ = new Subject<void>();
   private _cache: Map<string, boolean> | null = new Map();
-  private config!: AzlCacheProviderConfigType;
+  private config!: ProviderConfigType;
   //#endregion Class properties
 
   /**
@@ -33,10 +33,10 @@ export class AzlCacheRouter implements OnDestroy {
   constructor(
     private injector: Injector,
     @Optional() private router?: Router,
-    @Optional() private provider?: AzlCacheProvider,
+    @Optional() private provider?: CacheProvider,
     @Inject(AZL_CACHE_PROVIDER_CONFIG)
     @Optional()
-    config?: AzlCacheProviderConfigType
+    config?: ProviderConfigType
   ) {
     this.config = config ?? defaultConfigs;
   }

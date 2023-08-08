@@ -6,8 +6,8 @@ import {
   Pipe,
   PipeTransform,
 } from '@angular/core';
-import { map, Subject, takeUntil, tap } from 'rxjs';
-import { AzlCacheProvider } from './ngx-azl-cache.service';
+import { map, Subscription } from 'rxjs';
+import { CacheProvider } from './ngx-azl-cache.service';
 import { templateFactory } from './helpers';
 
 @Pipe({
@@ -15,14 +15,12 @@ import { templateFactory } from './helpers';
   pure: false,
 })
 @Injectable()
-export class AzlCachePipe implements PipeTransform, OnDestroy {
+export class CachePipe implements PipeTransform, OnDestroy {
   // #region Class properties
-  private result: Map<
-    string,
-    { lastparams: [string, string, string | string[]]; value: string }
-  > | null = new Map();
-  private _destroy$ = new Subject<void>();
+  private _latestValue: string | unknown = '...';
   private _ref: ChangeDetectorRef | null;
+  private _subscription!: Subscription | null;
+  private _search!: string | null;
   // #endregion Class properties
 
   /**
@@ -30,41 +28,23 @@ export class AzlCachePipe implements PipeTransform, OnDestroy {
    */
   constructor(
     ref: ChangeDetectorRef,
-    @Optional() private provider: AzlCacheProvider
+    @Optional() private provider: CacheProvider
   ) {
     // Assign `ref` into `this._ref` manually instead of declaring `_ref` in the constructor
     // parameter list, as the type of `this._ref` includes `null` unlike the type of `ref`.
     this._ref = ref;
   }
 
-  //
-  /**
-   * Compares the provided parameters agains the last
-   * parameters values
-   */
-  private exists(
-    searchkey: string,
-    params: [string, string, string | string[]]
-  ) {
-    if (!this.result?.has(searchkey)) {
-      return false;
-    }
-    const lastparams = this.result?.get(searchkey)?.lastparams ?? [];
-    let exists = true;
-    for (let index = 0; index < params.length; index++) {
-      if (lastparams[index] !== params[index]) {
-        exists = false;
-        break;
-      }
-    }
-    return exists;
-  }
-
   /**
    * Creates a search key for the map object
    */
-  private createSearchKey(query: string, name: string) {
-    return `${name}::${query}`;
+  private createSearchKey(
+    query: string,
+    name: string,
+    key: string,
+    value: string
+  ) {
+    return `${name}::${query}(${key}, ${value})`;
   }
 
   /**
@@ -72,53 +52,65 @@ export class AzlCachePipe implements PipeTransform, OnDestroy {
    * current pipe instance
    */
   private updateResult(
+    search: string,
     query: string,
     name: string,
     key = 'id',
-    label: string | string[] = 'label'
+    template: string | string[] = 'label'
   ) {
-    const onResult = (res: string) => {
-      if (res !== undefined && res !== null) {
-        this.result?.set(this.createSearchKey(query, name), {
-          value: res,
-          lastparams: [name, key, label],
-        });
-      }
-      // Note: `this._ref` is only cleared in `ngOnDestroy` so is known to be available when a
-      // value is being updated.
-      this._ref?.markForCheck();
-    };
-    this.provider.state$
+    if (
+      typeof query === 'undefined' ||
+      query === null ||
+      !String(query).length
+    ) {
+      throw new Error(`"value" parameter required`);
+    }
+    if (typeof name === 'undefined' || name === null || !String(name).length) {
+      throw new Error(`"name" parameter required`);
+    }
+    // Set the current search string to equals the search argument value
+    this._search = search;
+
+    // Subscribe to provider state change to query
+    this._subscription = this.provider.state$
       .pipe(
         map((state) => {
-          if (
-            typeof query === 'undefined' ||
-            query === null ||
-            !String(query).length
-          ) {
-            throw new Error(`"value" parameter required`);
-          }
-          if (
-            typeof name === 'undefined' ||
-            name === null ||
-            !String(name).length
-          ) {
-            throw new Error(`"name" parameter required`);
-          }
-          let result = '';
+          let result!: unknown | null;
           const _result = state.get(name);
           if (typeof _result !== 'undefined' && _result !== null) {
             const _value = _result.find((s) => {
               return String(s[key]) === String(query);
             });
-            result = _value ? templateFactory(label)(_value) : '';
+            result = _value
+              ? !template
+                ? _value
+                : templateFactory(template)(_value)
+              : '';
           }
           return result;
-        }),
-        tap(onResult),
-        takeUntil(this._destroy$)
+        })
       )
-      .subscribe();
+      .subscribe((result: unknown) => {
+        this._updateLatestValue(search, result);
+      });
+  }
+
+  private _updateLatestValue(search: string, value: unknown): void {
+    if (search === this._search) {
+      this._latestValue = value ?? '...';
+      // Note: `this._ref` is only cleared in `ngOnDestroy` so is known to be available when a
+      // value is being updated.
+      this._ref?.markForCheck();
+    }
+  }
+
+  private dispose() {
+    if (this._subscription) {
+      this._subscription.unsubscribe();
+    }
+    this._latestValue = null;
+    this._subscription = null;
+    this._search = null;
   }
 
   /**
@@ -129,29 +121,43 @@ export class AzlCachePipe implements PipeTransform, OnDestroy {
     query: string | number,
     name: string,
     key = 'id',
-    label: string | string[] = 'label'
+    template: string | string[] = 'label'
   ) {
     const _query = String(query);
     if (!_query || !_query.length) {
       return _query;
     }
-    // if we ask another time for the same key, return the last value
-    const searchkey = this.createSearchKey(_query, name);
-    if (this.exists(searchkey, [name, key, label])) {
-      return this.result?.get(searchkey)?.value ?? '';
+
+    if (!name) {
+      return _query;
     }
-    this.updateResult(_query, name, key, label);
-    return '';
+
+    if (typeof key === 'undefined' || key === null || !String(key).length) {
+      throw new Error(`"value" parameter required`);
+    }
+
+    const search = this.createSearchKey(
+      _query,
+      name,
+      key ?? 'id',
+      Array.isArray(template) ? template.join() : String(template)
+    );
+    if (!this._search) {
+      // if we ask another time for the same key, return the last value
+      this.updateResult(search, _query, name, key, template);
+      return this._latestValue;
+    }
+
+    if (search !== this._search) {
+      this.dispose();
+      this.transform(query, name, key, template);
+    }
+
+    return this._latestValue;
   }
 
-  /**
-   * {@inheritdoc}
-   *
-   * Provides object destruction implementation
-   */
   ngOnDestroy() {
-    this._destroy$.next();
+    this.dispose();
     this._ref = null;
-    this.result = null;
   }
 }

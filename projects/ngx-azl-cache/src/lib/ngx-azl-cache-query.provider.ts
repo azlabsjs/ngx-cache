@@ -11,8 +11,8 @@ import {
   queryPaginationate,
 } from './ngx-azl-cache-query.helpers';
 import {
-  AzlCacheProviderConfigType,
-  AzlCacheQueryProviderType,
+  ProviderConfigType,
+  CacheQueryProviderType,
   PageResult,
   QueryCacheConfigType,
   ResponseInterceptorType,
@@ -20,26 +20,26 @@ import {
 import { AZL_CACHE_PROVIDER_CONFIG } from './tokens';
 
 @Injectable()
-export class RESTQueryProvider implements AzlCacheQueryProviderType {
+export class HTTPQueryProvider implements CacheQueryProviderType {
   // #region Service properties
   _cacheConfig!: QueryCacheConfigType;
   get cacheConfig() {
     return this._cacheConfig;
   }
   private static cacheConfigNamePrefix = `query::bindTo[RESTQueryProvider]`;
-  private config!: AzlCacheProviderConfigType;
+  private config!: ProviderConfigType;
   // #endregion Service properties
 
   constructor(
     private http: HttpClient,
     @Inject(AZL_CACHE_PROVIDER_CONFIG)
     @Optional()
-    config?: AzlCacheProviderConfigType
+    config?: ProviderConfigType
   ) {
     this.config = config ?? defaultConfigs;
     this._cacheConfig = {
       observe: 'body',
-      name: RESTQueryProvider.cacheConfigNamePrefix,
+      name: HTTPQueryProvider.cacheConfigNamePrefix,
       refetchInterval: DEFAULT_QUERY_REFECTH_INTERVAL,
     };
   }
@@ -50,8 +50,8 @@ export class RESTQueryProvider implements AzlCacheQueryProviderType {
       ...(this._cacheConfig ?? {}),
       ...state,
       name: state.name
-        ? `${RESTQueryProvider.cacheConfigNamePrefix}::${state.name}`
-        : RESTQueryProvider.cacheConfigNamePrefix,
+        ? `${HTTPQueryProvider.cacheConfigNamePrefix}::${state.name}`
+        : HTTPQueryProvider.cacheConfigNamePrefix,
       // We make sure we always observe, the body of the query request
       observe: 'body',
     };
@@ -59,7 +59,7 @@ export class RESTQueryProvider implements AzlCacheQueryProviderType {
   }
 
   copy() {
-    return new RESTQueryProvider(this.http, this.config);
+    return new HTTPQueryProvider(this.http, this.config);
   }
 
   /**

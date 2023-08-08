@@ -1,9 +1,9 @@
-import { AzlCacheProviderType, QueryConfigType } from './types';
+import { CacheProviderType, QueryConfigType } from './types';
 
 /**
  * Creates a function for loading user provided slice
  */
-export function sliceQueryfactory(provider: AzlCacheProviderType) {
+export function sliceQueryfactory(provider: CacheProviderType) {
   return (query: QueryConfigType[]) => {
     provider.loadSlice(query);
   };

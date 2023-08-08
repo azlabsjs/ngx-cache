@@ -16,8 +16,8 @@ import {
 } from 'rxjs';
 import { CHUNK_SIZE_LIMIT, defaultConfigs, QUERY_INTERVAL } from './defaults';
 import {
-  AzlCacheProviderConfigType,
-  AzlCacheProviderType,
+  ProviderConfigType,
+  CacheProviderType,
   RequestConfigs,
   QueryConfigType,
 } from './types';
@@ -29,7 +29,7 @@ import {
 } from './tokens';
 
 @Injectable()
-export class AzlCacheProvider implements AzlCacheProviderType, OnDestroy {
+export class CacheProvider implements CacheProviderType, OnDestroy {
   // #region class properties
   private _state$ = new BehaviorSubject(
     new Map<string, Record<string, unknown>[]>()
@@ -42,7 +42,7 @@ export class AzlCacheProvider implements AzlCacheProviderType, OnDestroy {
   // Private property used in caching slice queries
   private requests: QueryConfigType[] = [];
   private aliases: string[] = [];
-  private config!: AzlCacheProviderConfigType;
+  private config!: ProviderConfigType;
   // #region class properties
 
   constructor(
@@ -50,7 +50,7 @@ export class AzlCacheProvider implements AzlCacheProviderType, OnDestroy {
     @Inject(REQUESTS) _requests: RequestConfigs,
     @Inject(AZL_CACHE_PROVIDER_CONFIG)
     @Optional()
-    config?: AzlCacheProviderConfigType
+    config?: ProviderConfigType
   ) {
     this.config = config ?? defaultConfigs;
     // For debugging purpose

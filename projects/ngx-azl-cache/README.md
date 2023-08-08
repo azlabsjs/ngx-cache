@@ -36,12 +36,12 @@ The configuration above provides basic configuration of the library in angular a
 
 - Loading / Caching backend data into frontend local store
 
-The library comes with a provider `AzlCacheProvider` that allows developpers to load data from the backend store into frontend cache. To load data when application inializes, we take adavantage of angular `APP_INITIALIZER` multi provider:
+The library comes with a provider `CacheProvider` that allows developpers to load data from the backend store into frontend cache. To load data when application inializes, we take adavantage of angular `APP_INITIALIZER` multi provider:
 
 ```ts
 // app.module.ts
 import { NgModule, APP_INITIALIZER } from "@angular/core";
-import { NgxAzlCacheModule, AzlCacheProvider } from "@azlabsjs/ngx-azl-cache";
+import { NgxAzlCacheModule, CacheProvider } from "@azlabsjs/ngx-azl-cache";
 
 // ...
 
@@ -53,7 +53,7 @@ NgModule({
   providers: [
     {
       provide: APP_INITIALIZER,
-      useFactory: (provider: AzlCacheProvider) => {
+      useFactory: (provider: CacheProvider) => {
         return async () => {
           if (provider) {
             provider.loadSlice([
@@ -71,7 +71,7 @@ NgModule({
           return Promise.resolve(true);
         };
       },
-      deps: [AzlCacheProvider],
+      deps: [CacheProvider],
     },
   ],
 });
@@ -79,14 +79,14 @@ export class AppModule {}
 ```
 
 **Note**
-The `AzlCacheProvider` uses an HTTP client to query data from the backend using REST interfaces. To override the default client used by the provider, developpers should create their own implementation and provides the `AZL_CACHE_QUERY_CLIENT` token through angular dependency injection:
+The `CacheProvider` uses an HTTP client to query data from the backend using REST interfaces. To override the default client used by the provider, developpers should create their own implementation and provides the `AZL_CACHE_QUERY_CLIENT` token through angular dependency injection:
 
 ```ts
 import { ResponseInterceptorType } from "@azlabsjs/ngx-azl-cache";
 import { Injectable } from "@angular/core";
 
 @Injectable()
-export class MyCustomQueryClient implements AzlCacheQueryProviderType {
+export class MyCustomQueryClient implements CacheQueryProviderType {
   // #region Service properties
   _cacheConfig!: QueryCacheConfigType;
   get cacheConfig() {
@@ -181,10 +181,10 @@ For performance reason, the data is loaded once if a given route matches. Subseq
 
 - Accessing the frontend cache
 
-The `AzlCacheProvider` provides a `state$` interface that allows developper to get data from cache. The `state$` is an rxjs observable instance that holds a javascript `Map` of all collection keys. In the example below, `app.post_types` is the key to the collection of `post_types` loaded in the store.
+The `CacheProvider` provides a `state$` interface that allows developper to get data from cache. The `state$` is an rxjs observable instance that holds a javascript `Map` of all collection keys. In the example below, `app.post_types` is the key to the collection of `post_types` loaded in the store.
 
 ```ts
-import { AzlCacheProvider } from "@azlabsjs/ngx-azl-cache";
+import { CacheProvider } from "@azlabsjs/ngx-azl-cache";
 import { map } from "rxjs/operators";
 
 @Component({
@@ -194,7 +194,7 @@ export class MyComponent {
   // Holds a reference to an observable of post_types
   posttypes$ = this.provider.state$.pipe(map((state) => state.get("app.post_types")));
 
-  constructor(private provider: AzlCacheProvider) {}
+  constructor(private provider: CacheProvider) {}
 }
 ```
 
@@ -203,7 +203,7 @@ export class MyComponent {
 The library also provides developpers with a pipe for projecting data from the store in the HTML template using cache key name, id, and label field.
 
 ```ts
-import { AzlCacheProvider } from "@azlabsjs/ngx-azl-cache";
+import { CacheProvider } from "@azlabsjs/ngx-azl-cache";
 import { map } from "rxjs/operators";
 
 @Component({

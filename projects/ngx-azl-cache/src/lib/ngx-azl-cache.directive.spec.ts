@@ -1,7 +1,7 @@
 import { CUSTOM_ELEMENTS_SCHEMA, Component, Input } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { AzlCacheDirective } from './ngx-azl-cache.directive';
-import { AzlCacheProvider } from './ngx-azl-cache.service';
+import { CacheDirective } from './ngx-azl-cache.directive';
+import { CacheProvider } from './ngx-azl-cache.service';
 import {
   AZL_CACHE_PROVIDER_CONFIG,
   AZL_CACHE_QUERY_CLIENT,
@@ -14,7 +14,7 @@ import {
   HttpClientTestingModule,
   HttpTestingController,
 } from '@angular/common/http/testing';
-import { RESTQueryProvider } from './ngx-azl-cache-query.provider';
+import { HTTPQueryProvider } from './ngx-azl-cache-query.provider';
 import { By } from '@angular/platform-browser';
 
 type Post = {
@@ -62,11 +62,11 @@ describe('HttpClient testing', () => {
   beforeEach(() => {
     fixture = TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      declarations: [TestComponent, AzlCacheDirective],
+      declarations: [TestComponent, CacheDirective],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
       providers: [
-        AzlCacheProvider,
-        RESTQueryProvider,
+        CacheProvider,
+        HTTPQueryProvider,
         {
           provide: AZL_CACHE_PROVIDER_CONFIG,
           useValue: defaultConfigs,
@@ -84,7 +84,7 @@ describe('HttpClient testing', () => {
         {
           provide: AZL_CACHE_QUERY_CLIENT,
           useFactory: () => {
-            return new RESTQueryProvider(httpClient, defaultConfigs);
+            return new HTTPQueryProvider(httpClient, defaultConfigs);
           },
         },
       ],
@@ -95,7 +95,7 @@ describe('HttpClient testing', () => {
   });
 
   it('should have an HTML element with innerHTML equals `Environments, More News` when template equals `{title}, {label}`', () => {
-    const el = fixture.debugElement.query(By.directive(AzlCacheDirective));
+    const el = fixture.debugElement.query(By.directive(CacheDirective));
     fixture.detectChanges(); // Trigger ngOnInit
 
     // Simulate HTTP request
@@ -111,7 +111,7 @@ describe('HttpClient testing', () => {
   });
 
   it('should have an HTML element with innerHTML equals `Environments More News` when template equals ["title", "label"]', () => {
-    const el = fixture.debugElement.query(By.directive(AzlCacheDirective));
+    const el = fixture.debugElement.query(By.directive(CacheDirective));
 
     fixture.componentInstance.template = ['title', 'label'];
 
@@ -130,7 +130,7 @@ describe('HttpClient testing', () => {
   });
 
   it('should have an HTML element with innerHTML equals `Environments` when template equals `title`', () => {
-    const el = fixture.debugElement.query(By.directive(AzlCacheDirective));
+    const el = fixture.debugElement.query(By.directive(CacheDirective));
 
     fixture.componentInstance.template = 'title';
 

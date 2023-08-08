@@ -1,17 +1,17 @@
 import { InjectionToken } from '@angular/core';
 import {
-  AzlCacheProviderConfigType,
-  AzlCacheQueryProviderType,
+  ProviderConfigType,
+  CacheQueryProviderType,
   RequestConfigs,
 } from './types';
 
 export const AZL_CACHE_QUERY_CLIENT =
-  new InjectionToken<AzlCacheQueryProviderType>(
+  new InjectionToken<CacheQueryProviderType>(
     'Azl cache query provider type'
   );
 
 export const AZL_CACHE_PROVIDER_CONFIG =
-  new InjectionToken<AzlCacheProviderConfigType>(
+  new InjectionToken<ProviderConfigType>(
     'Provides Azl cache provider configuration values'
   );
 

@@ -36,7 +36,7 @@ export type QueryCacheConfigType = CacheQueryConfig & {
 /**
  * Type definition of the azl cache query provider type
  */
-export type AzlCacheQueryProviderType = QueryProviderType<
+export type CacheQueryProviderType = QueryProviderType<
   [
     string,
     string,
@@ -52,12 +52,12 @@ export type AzlCacheQueryProviderType = QueryProviderType<
    */
   setCacheConfig(
     state: Partial<QueryCacheConfigType>
-  ): AzlCacheQueryProviderType;
+  ): CacheQueryProviderType;
 
   /**
    * Creates a copy of the {@see AzlCacheQueryProviderType} instance
    */
-  copy(): AzlCacheQueryProviderType;
+  copy(): CacheQueryProviderType;
 };
 
 /**
@@ -70,7 +70,7 @@ export type ResponseInterceptorType = <T>(
 /**
  * Provides module configuration type
  */
-export type AzlCacheProviderConfigType = {
+export type ProviderConfigType = {
   debug: boolean;
   chunkSize?: number;
   queryInterval?: number;
@@ -101,7 +101,7 @@ export type QueryConfigType = {
  * developpers with method for loading part of the database at the background
  * level on a predefined time basics
  */
-export interface AzlCacheProviderType {
+export interface CacheProviderType {
   /**
    * Cache readonly state property
    */

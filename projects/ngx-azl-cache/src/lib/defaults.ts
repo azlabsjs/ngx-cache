@@ -1,4 +1,4 @@
-import { AzlCacheProviderConfigType } from './types';
+import { ProviderConfigType } from './types';
 
 /**
  * @internal
@@ -42,4 +42,4 @@ export const defaultConfigs = {
   router: {
     autoload: false,
   },
-} as AzlCacheProviderConfigType;
+} as ProviderConfigType;

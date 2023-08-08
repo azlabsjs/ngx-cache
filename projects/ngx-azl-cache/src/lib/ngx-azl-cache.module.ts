@@ -2,28 +2,29 @@ import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { APP_INITIALIZER, ModuleWithProviders, NgModule } from '@angular/core';
 import { defaultConfigs } from './defaults';
-import { RESTQueryProvider } from './ngx-azl-cache-query.provider';
-import { AzlCachePipe } from './ngx-azl-cache.pipe';
-import { AzlCacheRouter } from './ngx-azl-cache.router';
-import { AzlCacheProvider } from './ngx-azl-cache.service';
-import { AzlCacheProviderConfigType } from './types';
+import { HTTPQueryProvider } from './ngx-azl-cache-query.provider';
+import { CachePipe } from './ngx-azl-cache.pipe';
+import { CacheRouter } from './ngx-azl-cache.router';
+import { CacheProvider } from './ngx-azl-cache.service';
+import { ProviderConfigType } from './types';
 import {
   AZL_CACHE_PROVIDER_CONFIG,
   AZL_CACHE_QUERY_CLIENT,
   REQUESTS,
 } from './tokens';
+import { CacheDirective } from './ngx-azl-cache.directive';
 
 @NgModule({
   imports: [CommonModule],
-  declarations: [AzlCachePipe],
-  exports: [AzlCachePipe],
+  declarations: [CachePipe, CacheDirective],
+  exports: [CachePipe, CacheDirective],
   providers: [
-    RESTQueryProvider,
-    AzlCachePipe,
+    HTTPQueryProvider,
+    CachePipe,
     {
       provide: AZL_CACHE_QUERY_CLIENT,
-      useFactory: (http: HttpClient, config: AzlCacheProviderConfigType) => {
-        return new RESTQueryProvider(http, config);
+      useFactory: (http: HttpClient, config: ProviderConfigType) => {
+        return new HTTPQueryProvider(http, config);
       },
       deps: [HttpClient, AZL_CACHE_PROVIDER_CONFIG],
     },
@@ -31,13 +32,13 @@ import {
 })
 export class NgxAzlCacheModule {
   static forRoot(
-    config: AzlCacheProviderConfigType
+    config: ProviderConfigType
   ): ModuleWithProviders<NgxAzlCacheModule> {
     return {
       ngModule: NgxAzlCacheModule,
       providers: [
-        AzlCacheProvider,
-        AzlCacheRouter,
+        CacheProvider,
+        CacheRouter,
         {
           provide: AZL_CACHE_PROVIDER_CONFIG,
           useValue: {
@@ -46,12 +47,12 @@ export class NgxAzlCacheModule {
               config.responseInterceptor ?? defaultConfigs.responseInterceptor,
             pagination: config.pagination ?? defaultConfigs.pagination,
             router: config.router ?? defaultConfigs.router,
-          } as AzlCacheProviderConfigType,
+          } as ProviderConfigType,
         },
         {
           provide: APP_INITIALIZER,
           multi: true,
-          useFactory: (router: AzlCacheRouter) => {
+          useFactory: (router: CacheRouter) => {
             return async () => {
               if (config.router && Boolean(config.router?.autoload) === true) {
                 router.subscribe();
@@ -59,7 +60,7 @@ export class NgxAzlCacheModule {
               return Promise.resolve(true);
             };
           },
-          deps: [AzlCacheRouter],
+          deps: [CacheRouter],
         },
         {
           provide: REQUESTS,
