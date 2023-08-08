@@ -44,7 +44,6 @@ export class AzlCacheDirective implements AfterViewInit, OnDestroy {
     @Inject(DOCUMENT) private document?: Document,
     @Optional() private provider?: AzlCacheProvider
   ) {
-    this.appendTextNode('...');
     const _subscription = this.provider?.state$
       .pipe(
         map((state) => state.get(this.key)),
