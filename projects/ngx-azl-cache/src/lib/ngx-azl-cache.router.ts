@@ -18,19 +18,18 @@ import { defaultConfigs } from './defaults';
 import { AzlCacheProvider } from './ngx-azl-cache.service';
 import { AzlCacheProviderConfigType } from './types';
 import { AZL_CACHE_PROVIDER_CONFIG } from './tokens';
+import { QueryConfigType } from 'ngx-azl-cache';
 
 @Injectable()
 export class AzlCacheRouter implements OnDestroy {
   //#region Class properties
   private readonly _destroy$ = new Subject<void>();
   private _cache: Map<string, boolean> | null = new Map();
+  private config!: AzlCacheProviderConfigType;
   //#endregion Class properties
 
   /**
    * Creates an instance of {@see AzlCacheRouter} service class
-   *
-   * @param router
-   * @param analytics
    */
   constructor(
     private injector: Injector,
@@ -38,8 +37,10 @@ export class AzlCacheRouter implements OnDestroy {
     @Optional() private provider?: AzlCacheProvider,
     @Inject(AZL_CACHE_PROVIDER_CONFIG)
     @Optional()
-    private config: AzlCacheProviderConfigType = defaultConfigs
-  ) {}
+    config?: AzlCacheProviderConfigType
+  ) {
+    this.config = config ?? defaultConfigs;
+  }
 
   /**
    * Provides a subscription
@@ -70,9 +71,31 @@ export class AzlCacheRouter implements OnDestroy {
                 }
                 const _path = path.startsWith('/') ? path : `/${path}`;
                 // TODO: If required in future release use regular expression
+                const _cachedQueries = this.provider?.getRequestConfigs() ?? [];
                 const value = slices[path];
                 if (url.startsWith(_path) && value) {
-                  this.provider?.loadSlice(value);
+                  const slice: QueryConfigType[] = [];
+                  for (const query of value) {
+                    if (typeof query === 'undefined' || query === null) {
+                      continue;
+                    }
+                    if (typeof query === 'string') {
+                      const result = _cachedQueries.find(
+                        (current) => current.key === query
+                      );
+                      if (result) {
+                        slice.push(result);
+                      }
+                      continue;
+                    }
+
+                    // Add the query to list of configuration cache
+                    this.provider?.addRequestConfig(query);
+
+                    // Push the query on top of the query stack
+                    slice.push(query);
+                  }
+                  this.provider?.loadSlice(slice);
                   // Case a slice is loaded for a given path, we add the path
                   // to the route load internal cache, in order to not reload it again
                   this._cache?.set(path, true);

@@ -11,19 +11,22 @@ import {
   forkJoin,
   interval,
   mergeMap,
-  Subject,
+  Subscription,
   take,
-  takeUntil,
 } from 'rxjs';
 import { CHUNK_SIZE_LIMIT, defaultConfigs, QUERY_INTERVAL } from './defaults';
 import {
   AzlCacheProviderConfigType,
   AzlCacheProviderType,
+  RequestConfigs,
   QueryConfigType,
-  SliceQueryType,
 } from './types';
 
-import { AZL_CACHE_PROVIDER_CONFIG, AZL_CACHE_QUERY_CLIENT } from './tokens';
+import {
+  AZL_CACHE_PROVIDER_CONFIG,
+  AZL_CACHE_QUERY_CLIENT,
+  REQUESTS,
+} from './tokens';
 
 @Injectable()
 export class AzlCacheProvider implements AzlCacheProviderType, OnDestroy {
@@ -34,24 +37,39 @@ export class AzlCacheProvider implements AzlCacheProviderType, OnDestroy {
   get state$() {
     return this._state$.asObservable();
   }
-  private _destroy$ = new Subject<void>();
+  private _subscriptions: Subscription[] = [];
+
+  // Private property used in caching slice queries
+  private requests: QueryConfigType[] = [];
+  private aliases: string[] = [];
+  private config!: AzlCacheProviderConfigType;
   // #region class properties
 
   constructor(
     private injector: Injector,
+    @Inject(REQUESTS) _requests: RequestConfigs,
     @Inject(AZL_CACHE_PROVIDER_CONFIG)
     @Optional()
-    private config: AzlCacheProviderConfigType = defaultConfigs
+    config?: AzlCacheProviderConfigType
   ) {
+    this.config = config ?? defaultConfigs;
     // For debugging purpose
     if (this.config.debug) {
-      this.state$
-        .pipe(takeUntil(this._destroy$))
-        .subscribe((state) => console.log('azl cache state: ', state));
+      const _subscription = this.state$.subscribe((state) =>
+        console.log('azl cache state: ', state)
+      );
+      this._subscriptions.push(_subscription);
+    }
+    this.requests =
+      typeof _requests === 'function' ? _requests(injector) : [..._requests];
+
+    // Add all request aliases to the aliases array
+    for (const request of this.requests) {
+      this.aliases.push(request.key);
     }
   }
 
-  loadSlice(query: SliceQueryType) {
+  loadSlice(query: QueryConfigType[]) {
     // For better performance and in order not to load the server
     // with request, we will create a chunk of query parameters
     // We default the chunk size to 5, if configuration instance is not injected
@@ -61,28 +79,34 @@ export class AzlCacheProvider implements AzlCacheProviderType, OnDestroy {
     chunksize = Math.min(chunksize, 15); //
     const chunks = this.chunkQueryParams(query, chunksize);
     let _interval = 0;
-    // For the first chunk we do not provide any delay
-    // const requests = [
-    //   forkJoin(chunks[0].map((param) => this.querySlice(param))),
-    // ];
-    forkJoin(chunks[0].map((param) => this.querySlice(param)))
-      .pipe(takeUntil(this._destroy$))
-      .subscribe();
+    this._subscriptions.push(
+      forkJoin(chunks[0].map((param) => this.querySlice(param))).subscribe()
+    );
     for (const chunk of chunks.slice(1)) {
       // We assume each request takes a maximum of 1 seconds, we use a query interval of number
       // of chunks divided by 2 for each chunk
       _interval +=
         this.config?.queryInterval ??
         (chunksize ? (chunksize * 1000) / 2 : QUERY_INTERVAL);
-      interval(_interval)
+      const _subscription = interval(_interval)
         .pipe(
           take(1),
           mergeMap(() => forkJoin(chunk.map((param) => this.querySlice(param))))
         )
-        .pipe(takeUntil(this._destroy$))
         .subscribe();
+      this._subscriptions.push(_subscription);
     }
-    // forkJoin(requests).pipe(takeUntil(this._destroy$)).subscribe();
+  }
+
+  getRequestConfigs() {
+    return this.requests;
+  }
+
+  addRequestConfig(query: QueryConfigType): void {
+    if (this.aliases.indexOf(query.key) !== -1) {
+      return;
+    }
+    this.requests.push(query);
   }
 
   /**
@@ -148,7 +172,7 @@ export class AzlCacheProvider implements AzlCacheProviderType, OnDestroy {
    * data is loaded from the backend server. It will notify the cache
    * store whenever the data became available
    */
-  createResponseCallback(key: string) {
+  private createResponseCallback(key: string) {
     return (items: Record<string, unknown>[], partial: boolean) => {
       const cache = this._state$.getValue();
       if (partial && cache.has(key) && (cache.get(key) ?? []).length !== 0) {
@@ -164,6 +188,8 @@ export class AzlCacheProvider implements AzlCacheProviderType, OnDestroy {
    * Provides object destruction implementation
    */
   ngOnDestroy() {
-    this._destroy$.next();
+    for (const subscription of this._subscriptions) {
+      subscription.unsubscribe();
+    }
   }
 }

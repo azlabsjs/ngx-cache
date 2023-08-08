@@ -13,6 +13,19 @@ export type PaginationChunkReturnType = (
 ) => number[][];
 
 /**
+ * Query object for selecting values from the
+ * query data source at runtime
+ */
+export type SliceQueryType = (QueryConfigType | string)[];
+
+/**
+ * @internal
+ */
+export type RequestConfigs =
+  | QueryConfigType[]
+  | ((injector: Injector) => QueryConfigType[]);
+
+/**
  * @internal
  */
 export type QueryCacheConfigType = CacheQueryConfig & {
@@ -27,7 +40,7 @@ export type AzlCacheQueryProviderType = QueryProviderType<
   [
     string,
     string,
-    (items: Record<string, unknown>[], partial: boolean) => void,
+    ((items: Record<string, unknown>[], partial: boolean) => void) | undefined,
     Record<string, string> | undefined,
     ResponseInterceptorType | undefined
   ]
@@ -65,6 +78,7 @@ export type AzlCacheProviderConfigType = {
   pagination?: {
     perPage: number;
   };
+  requests: RequestConfigs;
   router?: {
     autoload: boolean;
     slicesFactory?:
@@ -81,12 +95,6 @@ export type QueryConfigType = {
   responseInterceptor?: ResponseInterceptorType;
   cacheConfig?: CacheQueryConfig;
 };
-
-/**
- * Query object for selecting values from the
- * query data source at runtime
- */
-export type SliceQueryType = QueryConfigType[];
 
 /**
  * Database collection synchronization provider. It provides
@@ -108,6 +116,18 @@ export interface AzlCacheProviderType {
    * @param query
    */
   loadSlice(query: SliceQueryType): void;
+
+  /**
+   * Returns the list of cached queries for the current provider
+   */
+  getRequestConfigs(): QueryConfigType[];
+
+  /**
+   * Add a new query to the configured list of queries
+   * 
+   * @param query 
+   */
+  addRequestConfig(query: QueryConfigType): void;
 }
 
 export type PageResult<T = unknown> = {

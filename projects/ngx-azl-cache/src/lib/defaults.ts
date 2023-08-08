@@ -20,8 +20,11 @@ export const DEFAULT_QUERY_REFECTH_INTERVAL = 300000;
  *
  * Default response interceptor used by the azl cache provider
  */
-export const defaultResponseInterceptor = (response: Record<string, unknown>) =>
-  response['data'] ?? response;
+export const defaultResponseInterceptor = (
+  response: Record<string, unknown>
+) => {
+  return response['data'] ?? response;
+};
 
 /**
  * @internal

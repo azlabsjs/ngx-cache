@@ -8,6 +8,7 @@ import {
 } from '@angular/core';
 import { map, Subject, takeUntil, tap } from 'rxjs';
 import { AzlCacheProvider } from './ngx-azl-cache.service';
+import { templateFactory } from './helpers';
 
 @Pipe({
   name: 'azlcache',
@@ -16,8 +17,10 @@ import { AzlCacheProvider } from './ngx-azl-cache.service';
 @Injectable()
 export class AzlCachePipe implements PipeTransform, OnDestroy {
   // #region Class properties
-  private result: Map<string, { lastparams: string[]; value: string }> | null =
-    new Map();
+  private result: Map<
+    string,
+    { lastparams: [string, string, string | string[]]; value: string }
+  > | null = new Map();
   private _destroy$ = new Subject<void>();
   private _ref: ChangeDetectorRef | null;
   // #endregion Class properties
@@ -39,7 +42,10 @@ export class AzlCachePipe implements PipeTransform, OnDestroy {
    * Compares the provided parameters agains the last
    * parameters values
    */
-  private exists(searchkey: string, params: string[]) {
+  private exists(
+    searchkey: string,
+    params: [string, string, string | string[]]
+  ) {
     if (!this.result?.has(searchkey)) {
       return false;
     }
@@ -69,7 +75,7 @@ export class AzlCachePipe implements PipeTransform, OnDestroy {
     query: string,
     name: string,
     key = 'id',
-    label = 'label'
+    label: string | string[] = 'label'
   ) {
     const onResult = (res: string) => {
       if (res !== undefined && res !== null) {
@@ -105,9 +111,7 @@ export class AzlCachePipe implements PipeTransform, OnDestroy {
             const _value = _result.find((s) => {
               return String(s[key]) === String(query);
             });
-            if (_value) {
-              result = (_value[label] as string) ?? '';
-            }
+            result = _value ? templateFactory(label)(_value) : '';
           }
           return result;
         }),
@@ -121,7 +125,12 @@ export class AzlCachePipe implements PipeTransform, OnDestroy {
    * Transform user provided query value and return
    * the corresponding label from the db provider
    */
-  transform(query: string | number, name: string, key = 'id', label = 'label') {
+  transform(
+    query: string | number,
+    name: string,
+    key = 'id',
+    label: string | string[] = 'label'
+  ) {
     const _query = String(query);
     if (!_query || !_query.length) {
       return _query;

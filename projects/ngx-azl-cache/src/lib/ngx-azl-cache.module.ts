@@ -7,7 +7,11 @@ import { AzlCachePipe } from './ngx-azl-cache.pipe';
 import { AzlCacheRouter } from './ngx-azl-cache.router';
 import { AzlCacheProvider } from './ngx-azl-cache.service';
 import { AzlCacheProviderConfigType } from './types';
-import { AZL_CACHE_PROVIDER_CONFIG, AZL_CACHE_QUERY_CLIENT } from './tokens';
+import {
+  AZL_CACHE_PROVIDER_CONFIG,
+  AZL_CACHE_QUERY_CLIENT,
+  REQUESTS,
+} from './tokens';
 
 @NgModule({
   imports: [CommonModule],
@@ -56,6 +60,10 @@ export class NgxAzlCacheModule {
             };
           },
           deps: [AzlCacheRouter],
+        },
+        {
+          provide: REQUESTS,
+          useValue: config.requests ?? [],
         },
       ],
     };

@@ -27,14 +27,16 @@ export class RESTQueryProvider implements AzlCacheQueryProviderType {
     return this._cacheConfig;
   }
   private static cacheConfigNamePrefix = `query::bindTo[RESTQueryProvider]`;
+  private config!: AzlCacheProviderConfigType;
   // #endregion Service properties
 
   constructor(
     private http: HttpClient,
     @Inject(AZL_CACHE_PROVIDER_CONFIG)
     @Optional()
-    private readonly config: AzlCacheProviderConfigType = defaultConfigs
+    config?: AzlCacheProviderConfigType
   ) {
+    this.config = config ?? defaultConfigs;
     this._cacheConfig = {
       observe: 'body',
       name: RESTQueryProvider.cacheConfigNamePrefix,
@@ -73,7 +75,7 @@ export class RESTQueryProvider implements AzlCacheQueryProviderType {
   query(
     method: string,
     endpoint: string,
-    callback: (items: Record<string, unknown>[], partial: boolean) => void,
+    callback?: (items: Record<string, unknown>[], partial: boolean) => void,
     params?: Record<string, string>,
     responseInterceptor?: ResponseInterceptorType
   ) {
@@ -93,11 +95,12 @@ export class RESTQueryProvider implements AzlCacheQueryProviderType {
         )(response);
         // When the first page of data is loaded, we call the callback function
         // with the loaded data with the partial flag turns on
-        callback(items, true);
+        const total = Number(response.total ?? 0);
+        if (callback) {
+          callback(items, 0 === total || total <= items.length ? false : true);
+        }
         if (
-          response.total &&
-          response.total !== null &&
-          typeof response.total !== 'undefined' &&
+          0 !== total &&
           // Add a condition that checks if the total items
           // is not greater than the length of the list of query result items
           Number(response.total) > items.length
@@ -127,7 +130,11 @@ export class RESTQueryProvider implements AzlCacheQueryProviderType {
           )(createPaginationChunk).pipe(
             // When the pagination data is completed loading, we fetch call the callback
             // with result items, and the partial flag turned off
-            tap((state) => callback([...items, ...state.flat()], false)),
+            tap((state) => {
+              if (callback) {
+                callback([...items, ...state.flat()], false);
+              }
+            }),
             map(() => true)
           );
         }
