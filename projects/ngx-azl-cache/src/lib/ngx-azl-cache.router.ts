@@ -16,9 +16,8 @@ import {
 } from 'rxjs';
 import { defaultConfigs } from './defaults';
 import { AzlCacheProvider } from './ngx-azl-cache.service';
-import { AzlCacheProviderConfigType } from './types';
+import { AzlCacheProviderConfigType, QueryConfigType } from './types';
 import { AZL_CACHE_PROVIDER_CONFIG } from './tokens';
-import { QueryConfigType } from 'ngx-azl-cache';
 
 @Injectable()
 export class AzlCacheRouter implements OnDestroy {

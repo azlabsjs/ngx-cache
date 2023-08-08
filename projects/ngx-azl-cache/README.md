@@ -4,10 +4,10 @@ This library provides a backend data cache store for angular frontend applicatio
 
 ## Dependencies
 
-| @azlabsjs/ngx-azl-cache | @azlabsjs/ngx-query  | @azlabsjs/rx-query | Angular |
-|------------------------ | -------------------  | ------------------ | ------- |
-|^0.13.x                  | ^0.13.x              | ^0.1.x             | ^13.0   |
-|^0.13.x                  | ^0.14.x              | ^0.1.x             | ^14.0   |
+| @azlabsjs/ngx-azl-cache | @azlabsjs/ngx-query | @azlabsjs/rx-query | Angular |
+| ----------------------- | ------------------- | ------------------ | ------- |
+| ^0.13.x                 | ^0.13.x             | ^0.1.x             | ^13.0   |
+| ^0.13.x                 | ^0.14.x             | ^0.1.x             | ^14.0   |
 
 ## Usage
 
@@ -106,13 +106,7 @@ export class MyCustomQueryClient implements AzlCacheQueryProviderType {
     // as it's a singleton to avoid issues when performing queries
   }
 
-  query(
-    method: string,
-    endpoint: string,
-    callback: (items: any[], partial: boolean) => void,
-    params?: Record<string, string>,
-    responseInterceptor?: ResponseInterceptorType
-  ) {
+  query(method: string, endpoint: string, callback: (items: any[], partial: boolean) => void, params?: Record<string, string>, responseInterceptor?: ResponseInterceptorType) {
     // Provides implementation for sending query to the backend server
   }
 }
@@ -123,10 +117,7 @@ Then register the created service in your application module:
 ```ts
 // app.module.ts
 import { NgModule } from "@angular/core";
-import {
-  NgxAzlCacheModule,
-  AZL_CACHE_QUERY_CLIENT,
-} from "@azlabsjs/ngx-azl-cache";
+import { NgxAzlCacheModule, AZL_CACHE_QUERY_CLIENT } from "@azlabsjs/ngx-azl-cache";
 import { MyCustomQueryClient } from "path/to/service";
 
 // ...
@@ -197,13 +188,11 @@ import { AzlCacheProvider } from "@azlabsjs/ngx-azl-cache";
 import { map } from "rxjs/operators";
 
 @Component({
-    // ...
+  // ...
 })
 export class MyComponent {
   // Holds a reference to an observable of post_types
-  posttypes$ = this.provider.state$.pipe(
-    map((state) => state.get("app.post_types"))
-  );
+  posttypes$ = this.provider.state$.pipe(map((state) => state.get("app.post_types")));
 
   constructor(private provider: AzlCacheProvider) {}
 }
@@ -218,16 +207,15 @@ import { AzlCacheProvider } from "@azlabsjs/ngx-azl-cache";
 import { map } from "rxjs/operators";
 
 @Component({
-    // ...
-    template: `
-        <table>
-            <!-- Table structure -->
-            <td>{{ 2 | azlcache:app.post_types:id:label }}</td>
-        </table>
-    `
+  // ...
+  template: `
+    <table>
+      <!-- Table structure -->
+      <td>{{ 2 | azlcache : app.post_types : id : label }}</td>
+    </table>
+  `,
 })
-export class MyComponent {
-}
+export class MyComponent {}
 ```
 
 The syntax for querying using pipe is as follow:
@@ -235,6 +223,63 @@ The syntax for querying using pipe is as follow:
 > azlcache:<CACHE_COLLECTION_KEY_NAME>:<ID_FIELD_TO_MATCH_DATA_AGAINST>:<LABEL_FIELD_TO_DISPLAY>
 
 Note that the `id` and `label` parameter are optional. By default `id` and `label` are respectively used bny the pipe internally.
+
+### Using directive
+
+The library comes with a structural directive that fetches value from cache and build an output text node that is appended to the DOM selected element by the directive. It tends to be lighter than the router partials load as it only query for value matching the provided search query if it does not exists in cache.
+
+**Note** Using directive require a pre-configured request dictionnary that that allows developpers to use an alias to query for data. Below are required configuration and usage:
+
+```ts
+// app.module.ts
+import { NgModule } from "@angular/core";
+import { NgxAzlCacheModule } from "@azlabsjs/ngx-azl-cache";
+
+// ...
+
+NgModule({
+  imports: [
+    // ...
+
+    NgxAzlCacheModule.forRoot({
+      debug: environment.production === false, // Enable debugging
+      // Provides alias for each request to be performed by the query provider
+      requests: [
+        {
+          key: "posts",
+          endpoint: "/posts",
+        },
+      ],
+    }),
+  ],
+});
+export class AppModule {}
+```
+
+After the configuration, using the directive to fetch data is as follow:
+
+```ts
+@Component({
+  template: ` <p [azlCache]="'posts'" [template]="'label'" [search]="'id'" [query]="query"></p> `,
+})
+export class TestComponent {}
+```
+
+**Note** The directive API support the following inputs:
+
+- [azlaCache] : It's the main input of the directive that takes as argument the `alias` to a request object configured during module initialization.
+
+- [template] : The template input represent the output format if the value queried for is resolved. Below is a list of supported template format:
+
+  - A string representing the `property` to select in the resolved object.
+
+  - An array of `properties` to include in the output string. (Ex: Given `["title", "label"]` for this object `{"title": "Environments", "label": "More..."}`, the directive will output `Environments More...`)
+
+  - A template literal string that represent the final output with variables enclose in `{}`. (Ex: Given `{title}, {label}` for this object `{"title": "Environments", "label": "More..."}`, the directive will output `Environments, More...`)
+
+- [query] : Which represent the value to search for
+
+- [search] : Which represent the field used as matching for the provided value
 
 **Warning**
 The API as mature and might not change frequently, but library is still under active development, please use at your own risk.
