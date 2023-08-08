@@ -37,7 +37,7 @@ jobs:
       - name: Lint
         run: npm run lint
 
-      # - name: Test
-      #   run: npm run ci:test
+      - name: Test
+        run: npm run ci:test
     env:
       NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
