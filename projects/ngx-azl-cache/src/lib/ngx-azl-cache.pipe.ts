@@ -55,7 +55,7 @@ export class CachePipe implements PipeTransform, OnDestroy {
     search: string,
     query: string,
     name: string,
-    key = 'id',
+    prop = 'id',
     template: string | string[] = 'label'
   ) {
     if (
@@ -71,6 +71,9 @@ export class CachePipe implements PipeTransform, OnDestroy {
     // Set the current search string to equals the search argument value
     this._search = search;
 
+    // Trigger query
+    this._triggerSliceQuery(name, prop, query);
+
     // Subscribe to provider state change to query
     this._subscription = this.provider.state$
       .pipe(
@@ -79,7 +82,7 @@ export class CachePipe implements PipeTransform, OnDestroy {
           const _result = state.get(name);
           if (typeof _result !== 'undefined' && _result !== null) {
             const _value = _result.find((s) => {
-              return String(s[key]) === String(query);
+              return String(s[prop]) === String(query);
             });
             result = _value
               ? !template
@@ -114,13 +117,31 @@ export class CachePipe implements PipeTransform, OnDestroy {
   }
 
   /**
+   * Trigger _slice query for the search key
+   */
+  private _triggerSliceQuery(key: string, search: string, value: string) {
+    const cachedQueries = this.provider?.getRequestConfigs() ?? [];
+    const query = cachedQueries.find((value) => value.key === key);
+    // Try a load slice call that might send a request to backend server
+    // with the query parameter provided
+    if (query) {
+      this.provider.loadSlice([
+        {
+          ...query,
+          params: { ...(query.params ?? {}), [search]: value },
+        },
+      ]);
+    }
+  }
+
+  /**
    * Transform user provided query value and return
    * the corresponding label from the db provider
    */
   transform(
     query: string | number,
     name: string,
-    key = 'id',
+    prop = 'id',
     template: string | string[] = 'label'
   ) {
     const _query = String(query);
@@ -132,25 +153,25 @@ export class CachePipe implements PipeTransform, OnDestroy {
       return _query;
     }
 
-    if (typeof key === 'undefined' || key === null || !String(key).length) {
+    if (typeof prop === 'undefined' || prop === null || !String(prop).length) {
       throw new Error(`"value" parameter required`);
     }
 
     const search = this.createSearchKey(
       _query,
       name,
-      key ?? 'id',
+      prop ?? 'id',
       Array.isArray(template) ? template.join() : String(template)
     );
     if (!this._search) {
       // if we ask another time for the same key, return the last value
-      this.updateResult(search, _query, name, key, template);
+      this.updateResult(search, _query, name, prop, template);
       return this._latestValue;
     }
 
     if (search !== this._search) {
       this.dispose();
-      this.transform(query, name, key, template);
+      this.transform(query, name, prop, template);
     }
 
     return this._latestValue;

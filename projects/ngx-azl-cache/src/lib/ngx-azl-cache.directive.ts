@@ -75,7 +75,6 @@ export class CacheDirective implements AfterViewInit, OnDestroy {
       this.provider.loadSlice([
         {
           ...query,
-          // TODO: Review implementation to include search by label
           params: { ...(query.params ?? {}), [this.search]: this.query },
         },
       ]);
