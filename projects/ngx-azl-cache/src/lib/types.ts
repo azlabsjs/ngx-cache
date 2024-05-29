@@ -71,14 +71,14 @@ export type ResponseInterceptorType = <T>(
  * Provides module configuration type
  */
 export type ProviderConfigType = {
-  debug: boolean;
+  debug?: boolean;
   chunkSize?: number;
   queryInterval?: number;
   responseInterceptor?: ResponseInterceptorType;
   pagination?: {
     perPage: number;
   };
-  requests: RequestConfigs;
+  requests?: RequestConfigs;
   router?: {
     autoload: boolean;
     slicesFactory?:
