@@ -3,9 +3,9 @@ name: Lint & Test
 
 on:
   push:
-    branches: [master, v15]
+    branches: [master, v17.x]
   pull_request:
-    branches: [master, v15]
+    branches: [master, v17.x]
 
 jobs:
   build:
@@ -14,7 +14,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        node: ['16.x', '18.x']
+        node: ['18', '20']
         os: [ubuntu-latest, windows-latest]
 
     steps:
