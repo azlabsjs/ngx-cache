@@ -5,7 +5,6 @@ import {
   OnDestroy,
   Optional,
 } from '@angular/core';
-import { useQuery } from '@azlabsjs/ngx-query';
 import {
   BehaviorSubject,
   forkJoin,
@@ -156,7 +155,7 @@ export class CacheProvider implements CacheProviderType, OnDestroy {
         observe: 'body',
       });
     }
-    // Returns the result of the useQuery() function implementation
+
     return useQuery(
       provider,
       method ?? 'GET',

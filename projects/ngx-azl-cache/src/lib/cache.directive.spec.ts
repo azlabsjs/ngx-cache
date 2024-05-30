@@ -1,7 +1,7 @@
 import { CUSTOM_ELEMENTS_SCHEMA, Component, Input } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { CacheDirective } from './ngx-azl-cache.directive';
-import { CacheProvider } from './ngx-azl-cache.service';
+import { CacheDirective } from './cache.directive';
+import { CacheProvider } from './cache.service';
 import {
   AZL_CACHE_PROVIDER_CONFIG,
   AZL_CACHE_QUERY_CLIENT,
@@ -14,7 +14,7 @@ import {
   HttpClientTestingModule,
   HttpTestingController,
 } from '@angular/common/http/testing';
-import { HTTPQueryProvider } from './ngx-azl-cache-query.provider';
+import { HTTPQueryProvider } from './cache-query.provider';
 import { By } from '@angular/platform-browser';
 
 type Post = {

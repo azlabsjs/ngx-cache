@@ -11,7 +11,7 @@ import {
   Output,
   ViewContainerRef,
 } from '@angular/core';
-import { CacheProvider } from './ngx-azl-cache.service';
+import { CacheProvider } from './cache.service';
 import { Subscription, distinctUntilChanged, filter, map, tap } from 'rxjs';
 import { DOCUMENT } from '@angular/common';
 import { templateFactory } from './helpers';

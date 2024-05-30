@@ -15,7 +15,7 @@ import {
   tap,
 } from 'rxjs';
 import { defaultConfigs } from './defaults';
-import { CacheProvider } from './ngx-azl-cache.service';
+import { CacheProvider } from './cache.service';
 import { ProviderConfigType, QueryConfigType } from './types';
 import { AZL_CACHE_PROVIDER_CONFIG } from './tokens';
 

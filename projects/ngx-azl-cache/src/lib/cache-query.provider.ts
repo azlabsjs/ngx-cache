@@ -9,7 +9,7 @@ import {
 import {
   createPaginationChunk,
   queryPaginationate,
-} from './ngx-azl-cache-query.helpers';
+} from './cache-query.helpers';
 import {
   ProviderConfigType,
   CacheQueryProviderType,

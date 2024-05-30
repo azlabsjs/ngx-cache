@@ -7,7 +7,7 @@ import {
   PipeTransform,
 } from '@angular/core';
 import { map, Subscription } from 'rxjs';
-import { CacheProvider } from './ngx-azl-cache.service';
+import { CacheProvider } from './cache.service';
 import { templateFactory } from './helpers';
 
 @Pipe({
