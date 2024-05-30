@@ -20,7 +20,7 @@ import { ProviderConfigType, QueryConfigType } from './types';
 import { CACHE_PROVIDER_CONFIG } from './tokens';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class CacheRouter implements OnDestroy {
   //#region Class properties
@@ -49,15 +49,12 @@ export class CacheRouter implements OnDestroy {
    * @param unsubscribeNotifier
    */
   public subscribe(unsubscribeNotifier?: ObservableInput<unknown>) {
-    if (
-      this.config &&
-      typeof this.config.router &&
-      this.config.router?.slicesFactory
-    ) {
+    const { slicesFactory } = this.config?.router ?? {};
+    if (slicesFactory) {
       const slices =
-        typeof this.config.router.slicesFactory === 'function'
-          ? this.config.router.slicesFactory(this.injector)
-          : this.config.router.slicesFactory;
+        typeof slicesFactory === 'function'
+          ? slicesFactory(this.injector)
+          : slicesFactory ?? {};
       this.router?.events
         .pipe(
           filter((events) => events instanceof NavigationEnd),
