@@ -1,6 +1,9 @@
 import { Injector } from '@angular/core';
-import { ObserveKeyType } from '@azlabsjs/ngx-query';
-import { CacheQueryConfig, QueryProviderType } from '@azlabsjs/rx-query';
+import {
+  CacheQueryConfig,
+  QueryProviderType,
+  ObserveKeyType,
+} from '@azlabsjs/rx-query';
 import { Observable } from 'rxjs';
 
 /**
@@ -50,9 +53,7 @@ export type CacheQueryProviderType = QueryProviderType<
   /**
    * Provides {@property cacheConfig} property setter implementation
    */
-  setCacheConfig(
-    state: Partial<QueryCacheConfigType>
-  ): CacheQueryProviderType;
+  setCacheConfig(state: Partial<QueryCacheConfigType>): CacheQueryProviderType;
 
   /**
    * Creates a copy of the {@see AzlCacheQueryProviderType} instance
@@ -72,6 +73,7 @@ export type ResponseInterceptorType = <T>(
  */
 export type ProviderConfigType = {
   debug?: boolean;
+  logger?: { log: (message: string, ...args: any) => void | Promise<void> };
   chunkSize?: number;
   queryInterval?: number;
   responseInterceptor?: ResponseInterceptorType;
@@ -124,12 +126,13 @@ export interface CacheProviderType {
 
   /**
    * Add a new query to the configured list of queries
-   * 
-   * @param query 
+   *
+   * @param query
    */
   addRequestConfig(query: QueryConfigType): void;
 }
 
+/** @description Type declaration for queried page */
 export type PageResult<T = unknown> = {
   total: number;
   data: T[];
@@ -138,3 +141,52 @@ export type PageResult<T = unknown> = {
   lastPageURL?: string;
   page?: number;
 };
+
+
+/** @internal */
+export type HttpClientType = {
+  request: (
+    method: string,
+    url: string,
+    options?: {
+      body?: any;
+      headers?: {
+        [header: string]: string | string[];
+      };
+      observe?: 'body';
+      params?: {
+        [param: string]:
+          | string
+          | number
+          | boolean
+          | ReadonlyArray<string | number | boolean>;
+      };
+      responseType?: 'json';
+      reportProgress?: boolean;
+      withCredentials?: boolean;
+      transferCache?:
+        | {
+            includeHeaders?: string[];
+          }
+        | boolean;
+    }
+  ) => Observable<any>;
+};
+
+/** @internal */
+export type HttpParamsType = {
+  [param: string]:
+    | string
+    | number
+    | boolean
+    | ReadonlyArray<string | number | boolean>;
+};
+
+/** @description Query function type declaration */
+export type QueryFnType = (
+  method: string,
+  endpoint: string,
+  callback?: (items: Record<string, unknown>[], partial: boolean) => void,
+  params?: HttpParamsType,
+  responseInterceptor?: ResponseInterceptorType
+) => Observable<unknown>;

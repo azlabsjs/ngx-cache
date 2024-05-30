@@ -1,7 +1,11 @@
 export { sliceQueryfactory } from './helpers';
 export { NgxAzlCacheModule } from './cache.module';
 export { CachePipe } from './cache.pipe';
-export { CacheProvider } from './cache.service';
+export {
+  /** @deprecated Use `Cache` instead */
+  Cache as CacheProvider,
+  Cache,
+} from './cache.service';
 export { CacheDirective } from './cache.directive';
 export {
   ProviderConfigType,
@@ -13,4 +17,21 @@ export {
   SliceQueryType,
   RequestConfigs,
 } from './types';
-export { AZL_CACHE_PROVIDER_CONFIG, AZL_CACHE_QUERY_CLIENT } from './tokens';
+export {
+  /** @deprecated */
+  CACHE_PROVIDER_CONFIG as AZL_CACHE_PROVIDER_CONFIG,
+  /** @deprecated */
+  CACHE_QUERY_CLIENT as AZL_CACHE_QUERY_CLIENT,
+  CACHE_PROVIDER_CONFIG,
+  CACHE_QUERY_CLIENT,
+} from './tokens';
+
+/** Exported service providers */
+export {
+  provideCacheProviderConfig,
+  provideForInitialization,
+  provideQuerySlices,
+} from './providers';
+
+/** Exported standalone directives & pipes */
+export { CACHE_DIRECTIVES } from './directives';

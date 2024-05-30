@@ -1,24 +1,18 @@
 import { ProviderConfigType } from './types';
 
-/**
- * @internal
- */
+/** @internal */
 export const CHUNK_SIZE_LIMIT = 5;
 
-/**
- * @internal
- */
+/** @internal */
 export const QUERY_INTERVAL = 7000;
 
-/**
- * @internal
- */
+/** @internal */
 export const DEFAULT_QUERY_REFECTH_INTERVAL = 300000;
 
 /**
  * @internal
  *
- * Default response interceptor used by the azl cache provider
+ * @description Default response interceptor used by the azl cache provider
  */
 export const defaultResponseInterceptor = (
   response: Record<string, unknown>
@@ -28,10 +22,12 @@ export const defaultResponseInterceptor = (
 
 /**
  * @internal
- * Default values of the azl cache configuration
+ * 
+ * @description Default values of the azl cache configuration
  */
 export const defaultConfigs = {
   debug: false,
+  logger: undefined,
   chunkSize: CHUNK_SIZE_LIMIT,
   queryInterval: QUERY_INTERVAL,
   responseInterceptor: defaultResponseInterceptor,

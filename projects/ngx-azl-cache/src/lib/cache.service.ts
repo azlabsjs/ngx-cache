@@ -1,7 +1,6 @@
 import {
   Inject,
   Injectable,
-  Injector,
   OnDestroy,
   Optional,
 } from '@angular/core';
@@ -13,22 +12,29 @@ import {
   Subscription,
   take,
 } from 'rxjs';
-import { CHUNK_SIZE_LIMIT, defaultConfigs, QUERY_INTERVAL } from './defaults';
+import {
+  CHUNK_SIZE_LIMIT,
+  DEFAULT_QUERY_REFECTH_INTERVAL,
+  defaultConfigs,
+  QUERY_INTERVAL,
+} from './defaults';
 import {
   ProviderConfigType,
   CacheProviderType,
-  RequestConfigs,
   QueryConfigType,
 } from './types';
 
-import {
-  AZL_CACHE_PROVIDER_CONFIG,
-  AZL_CACHE_QUERY_CLIENT,
-  REQUESTS,
-} from './tokens';
+import { CACHE_PROVIDER_CONFIG, REQUESTS } from './tokens';
+import { CacheQueryConfig, useDebug, useQuery } from '@azlabsjs/rx-query';
+import { HttpClient } from '@angular/common/http';
+import { useHTTPQuery } from './helpers';
 
-@Injectable()
-export class CacheProvider implements CacheProviderType, OnDestroy {
+const CACHE_NAME_PREFIX = `query::bindTo[RESTQueryProvider]`;
+
+@Injectable({
+  providedIn: 'root',
+})
+export class Cache implements CacheProviderType, OnDestroy {
   // #region class properties
   private _state$ = new BehaviorSubject(
     new Map<string, Record<string, unknown>[]>()
@@ -45,22 +51,26 @@ export class CacheProvider implements CacheProviderType, OnDestroy {
   // #region class properties
 
   constructor(
-    private injector: Injector,
-    @Inject(REQUESTS) _requests: RequestConfigs,
-    @Inject(AZL_CACHE_PROVIDER_CONFIG)
+    private httpClient: HttpClient,
+    @Inject(REQUESTS) _requests: QueryConfigType[],
+    @Inject(CACHE_PROVIDER_CONFIG)
     @Optional()
     config?: ProviderConfigType
   ) {
     this.config = config ?? defaultConfigs;
+    this.requests = Array.isArray(this.requests) ? [..._requests] : [];
+
+    const { config: c } = this;
     // For debugging purpose
-    if (this.config.debug) {
-      const _subscription = this.state$.subscribe((state) =>
-        console.log('azl cache state: ', state)
+    if (c.debug) {
+      this._subscriptions.push(
+        this.state$.subscribe((state) =>
+          c.logger
+            ? c.logger.log('ngx-cache state: ', state)
+            : console.log('ngx-cache state: ', state)
+        )
       );
-      this._subscriptions.push(_subscription);
     }
-    this.requests =
-      typeof _requests === 'function' ? _requests(injector) : [..._requests];
 
     // Add all request aliases to the aliases array
     for (const request of this.requests) {
@@ -125,45 +135,54 @@ export class CacheProvider implements CacheProviderType, OnDestroy {
    */
   private querySlice(param: QueryConfigType) {
     const { method, endpoint, params, responseInterceptor, key } = param;
-    const _instance = this.injector.get(AZL_CACHE_QUERY_CLIENT);
-    // Check if the provider was resolved successfully. If the provider
-    // value resolves to undefined or null, we throw an exception like the
-    // angular internal dependency injector
-    if (typeof _instance === 'undefined' || _instance === null) {
-      throw new Error(`No Provider for ${AZL_CACHE_QUERY_CLIENT.toString()}`);
-    }
-    // Make a copy of the query provider, to avoid object mutation when updating cache
-    // configuration
-    const provider = _instance.copy();
+    const provider = useHTTPQuery(this.httpClient, this.config);
+
     // To support cache configuration for each query data to be loaded,
     // We update the state of the query client using developper provided one
-    if (param.cacheConfig) {
-      provider.setCacheConfig({
-        ...param.cacheConfig,
-        // We add the name attribe to add more caching customization
-        // to the query library cache calls
-        name: key,
-        // We make sure we always observe, the body of the query request
-        observe: 'body',
-      });
-    } else {
-      provider.setCacheConfig({
-        // We add the name attribe to add more caching customization
-        // to the query library cache calls
-        name: key,
-        // We make sure we always observe, the body of the query request
-        observe: 'body',
-      });
-    }
+    const cacheConfig: CacheQueryConfig & {
+      name: string;
+      cacheQuery: boolean;
+      observe: string;
+    } = param.cacheConfig
+      ? {
+          refetchInterval: DEFAULT_QUERY_REFECTH_INTERVAL,
+          ...param.cacheConfig,
+          name: key ? `${CACHE_NAME_PREFIX}::${key}` : CACHE_NAME_PREFIX,
+          // We make sure we always observe, the body of the query request
+          observe: 'body',
+          cacheQuery: true,
+        }
+      : {
+          refetchInterval: DEFAULT_QUERY_REFECTH_INTERVAL,
+          name: key,
+          // We make sure we always observe, the body of the query request
+          observe: 'body',
+          cacheQuery: true,
+        };
 
-    return useQuery(
-      provider,
-      method ?? 'GET',
-      endpoint,
-      this.createResponseCallback(key).bind(this),
-      params,
-      responseInterceptor ?? this.config?.responseInterceptor
-    );
+    return this.config && true === Boolean(this.config.debug)
+      ? useDebug(
+          this.config.logger ?? {
+            log: console.log,
+          }
+        )(
+          provider,
+          method ?? 'GET',
+          endpoint,
+          this.createResponseCallback(key).bind(this),
+          params,
+          responseInterceptor ?? this.config?.responseInterceptor,
+          cacheConfig
+        )
+      : useQuery(
+          provider,
+          method ?? 'GET',
+          endpoint,
+          this.createResponseCallback(key).bind(this),
+          params,
+          responseInterceptor ?? this.config?.responseInterceptor,
+          cacheConfig
+        );
   }
 
   /**

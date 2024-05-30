@@ -15,11 +15,13 @@ import {
   tap,
 } from 'rxjs';
 import { defaultConfigs } from './defaults';
-import { CacheProvider } from './cache.service';
+import { Cache } from './cache.service';
 import { ProviderConfigType, QueryConfigType } from './types';
-import { AZL_CACHE_PROVIDER_CONFIG } from './tokens';
+import { CACHE_PROVIDER_CONFIG } from './tokens';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class CacheRouter implements OnDestroy {
   //#region Class properties
   private readonly _destroy$ = new Subject<void>();
@@ -33,8 +35,8 @@ export class CacheRouter implements OnDestroy {
   constructor(
     private injector: Injector,
     @Optional() private router?: Router,
-    @Optional() private provider?: CacheProvider,
-    @Inject(AZL_CACHE_PROVIDER_CONFIG)
+    @Optional() private provider?: Cache,
+    @Inject(CACHE_PROVIDER_CONFIG)
     @Optional()
     config?: ProviderConfigType
   ) {

@@ -1,21 +1,14 @@
 import { CUSTOM_ELEMENTS_SCHEMA, Component, Input } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { CacheDirective } from './cache.directive';
-import { CacheProvider } from './cache.service';
-import {
-  AZL_CACHE_PROVIDER_CONFIG,
-  AZL_CACHE_QUERY_CLIENT,
-  REQUESTS,
-} from './tokens';
 import { defaultConfigs } from './defaults';
-import { RequestConfigs } from './types';
 import { HttpClient } from '@angular/common/http';
 import {
   HttpClientTestingModule,
   HttpTestingController,
 } from '@angular/common/http/testing';
-import { HTTPQueryProvider } from './cache-query.provider';
 import { By } from '@angular/platform-browser';
+import { provideCacheProviderConfig, provideQuerySlices } from './providers';
 
 type Post = {
   title?: string;
@@ -61,32 +54,19 @@ describe('HttpClient testing', () => {
 
   beforeEach(() => {
     fixture = TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
-      declarations: [TestComponent, CacheDirective],
+      imports: [HttpClientTestingModule, CacheDirective],
+      declarations: [TestComponent],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
       providers: [
-        CacheProvider,
-        HTTPQueryProvider,
-        {
-          provide: AZL_CACHE_PROVIDER_CONFIG,
-          useValue: defaultConfigs,
-        },
-        {
-          provide: REQUESTS,
-          useValue: [
-            {
-              key: 'posts',
-              endpoint: '/posts',
-              method: 'POST',
-            },
-          ] as RequestConfigs,
-        },
-        {
-          provide: AZL_CACHE_QUERY_CLIENT,
-          useFactory: () => {
-            return new HTTPQueryProvider(httpClient, defaultConfigs);
+        // CacheProvider,
+        provideCacheProviderConfig(defaultConfigs),
+        provideQuerySlices([
+          {
+            key: 'posts',
+            endpoint: '/posts',
+            method: 'POST',
           },
-        },
+        ]),
       ],
     }).createComponent(TestComponent);
     // Inject the http service and test controller for each test

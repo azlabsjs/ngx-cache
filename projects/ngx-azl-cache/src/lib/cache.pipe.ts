@@ -7,18 +7,19 @@ import {
   PipeTransform,
 } from '@angular/core';
 import { map, Subscription } from 'rxjs';
-import { CacheProvider } from './cache.service';
+import { Cache } from './cache.service';
 import { templateFactory } from './helpers';
 
 @Pipe({
   name: 'azlcache',
   pure: false,
+  standalone: true
 })
 @Injectable()
 export class CachePipe implements PipeTransform, OnDestroy {
   // #region Class properties
-  private _latestValue: string | unknown = '...';
-  private _ref: ChangeDetectorRef | null;
+  private _latestValue!: string | unknown;
+  private _ref!: ChangeDetectorRef | null;
   private _subscription!: Subscription | null;
   private _search!: string | null;
   // #endregion Class properties
@@ -28,7 +29,7 @@ export class CachePipe implements PipeTransform, OnDestroy {
    */
   constructor(
     ref: ChangeDetectorRef,
-    @Optional() private provider: CacheProvider
+    @Optional() private provider: Cache
   ) {
     // Assign `ref` into `this._ref` manually instead of declaring `_ref` in the constructor
     // parameter list, as the type of `this._ref` includes `null` unlike the type of `ref`.
@@ -63,7 +64,7 @@ export class CachePipe implements PipeTransform, OnDestroy {
       query === null ||
       !String(query).length
     ) {
-      throw new Error(`"value" parameter required`);
+      throw new Error(`"query" parameter required`);
     }
     if (typeof name === 'undefined' || name === null || !String(name).length) {
       throw new Error(`"name" parameter required`);
@@ -94,13 +95,13 @@ export class CachePipe implements PipeTransform, OnDestroy {
         })
       )
       .subscribe((result: unknown) => {
-        this._updateLatestValue(search, result);
+        this._updateLatestValue(search, result, query);
       });
   }
 
-  private _updateLatestValue(search: string, value: unknown): void {
+  private _updateLatestValue(search: string, value: unknown, q?: string): void {
     if (search === this._search) {
-      this._latestValue = value ?? '...';
+      this._latestValue = value ?? q ?? '...';
       // Note: `this._ref` is only cleared in `ngOnDestroy` so is known to be available when a
       // value is being updated.
       this._ref?.markForCheck();

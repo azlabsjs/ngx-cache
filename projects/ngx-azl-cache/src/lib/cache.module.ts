@@ -1,46 +1,29 @@
 import { CommonModule } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
 import { APP_INITIALIZER, ModuleWithProviders, NgModule } from '@angular/core';
 import { defaultConfigs } from './defaults';
-import { HTTPQueryProvider } from './cache-query.provider';
 import { CachePipe } from './cache.pipe';
 import { CacheRouter } from './cache.router';
-import { CacheProvider } from './cache.service';
 import { ProviderConfigType } from './types';
-import {
-  AZL_CACHE_PROVIDER_CONFIG,
-  AZL_CACHE_QUERY_CLIENT,
-  REQUESTS,
-} from './tokens';
-import { CacheDirective } from './cache.directive';
+import { CACHE_PROVIDER_CONFIG, REQUESTS } from './tokens';
+import { CACHE_DIRECTIVES } from './directives';
 
+/** @deprecated */
 @NgModule({
-  imports: [CommonModule],
-  declarations: [CachePipe, CacheDirective],
-  exports: [CachePipe, CacheDirective],
-  providers: [
-    HTTPQueryProvider,
-    CachePipe,
-    {
-      provide: AZL_CACHE_QUERY_CLIENT,
-      useFactory: (http: HttpClient, config: ProviderConfigType) => {
-        return new HTTPQueryProvider(http, config);
-      },
-      deps: [HttpClient, AZL_CACHE_PROVIDER_CONFIG],
-    },
-  ],
+  imports: [CommonModule, ...CACHE_DIRECTIVES],
+  declarations: [],
+  exports: [...CACHE_DIRECTIVES],
+  providers: [CachePipe],
 })
 export class NgxAzlCacheModule {
+  /**  @deprecated register services using `provideCacheProviderConfig`, `provideForInitialization`, `provideQuerySlices` instead */
   static forRoot(
     config: ProviderConfigType
   ): ModuleWithProviders<NgxAzlCacheModule> {
     return {
       ngModule: NgxAzlCacheModule,
       providers: [
-        CacheProvider,
-        CacheRouter,
         {
-          provide: AZL_CACHE_PROVIDER_CONFIG,
+          provide: CACHE_PROVIDER_CONFIG,
           useValue: {
             ...config,
             responseInterceptor:

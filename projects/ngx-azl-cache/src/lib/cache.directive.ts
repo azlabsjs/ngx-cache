@@ -11,7 +11,7 @@ import {
   Output,
   ViewContainerRef,
 } from '@angular/core';
-import { CacheProvider } from './cache.service';
+import { Cache } from './cache.service';
 import { Subscription, distinctUntilChanged, filter, map, tap } from 'rxjs';
 import { DOCUMENT } from '@angular/common';
 import { templateFactory } from './helpers';
@@ -19,6 +19,7 @@ import { templateFactory } from './helpers';
 @Directive({
   // eslint-disable-next-line @angular-eslint/directive-selector
   selector: '[azlCache]',
+  standalone: true
 })
 export class CacheDirective implements AfterViewInit, OnDestroy {
   // #region Directive inputs
@@ -42,7 +43,7 @@ export class CacheDirective implements AfterViewInit, OnDestroy {
     private ref: ViewContainerRef,
     private changes: ChangeDetectorRef,
     @Inject(DOCUMENT) private document?: Document,
-    @Optional() private provider?: CacheProvider
+    @Optional() private provider?: Cache
   ) {
     const _subscription = this.provider?.state$
       .pipe(
