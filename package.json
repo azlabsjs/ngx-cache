@@ -1,6 +1,6 @@
 {
   "name": "azl-cache",
-  "version": "0.17.29",
+  "version": "0.17.30",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
