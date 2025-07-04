@@ -2,8 +2,14 @@ import { CUSTOM_ELEMENTS_SCHEMA, Component, Input } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { CacheDirective } from './cache.directive';
 import { defaultConfigs } from './defaults';
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
-import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import {
+  provideHttpClient,
+  withInterceptorsFromDi,
+} from '@angular/common/http';
+import {
+  HttpTestingController,
+  provideHttpClientTesting,
+} from '@angular/common/http/testing';
 import { By } from '@angular/platform-browser';
 import { provideCacheProviderConfig, provideQuerySlices } from './providers';
 
@@ -30,14 +36,16 @@ const testData: Post[] = [
 ];
 
 @Component({
-    template: `
+  imports: [CacheDirective],
+  standalone: true,
+  template: `
     <p
       [azlCache]="'posts'"
       [template]="template"
       [search]="'id'"
       [query]="query"
     ></p>
-  `
+  `,
 })
 export class TestComponent {
   @Input() query = 2;
@@ -51,23 +59,22 @@ describe('HttpClient testing', () => {
 
   beforeEach(() => {
     fixture = TestBed.configureTestingModule({
-    declarations: [TestComponent],
-    schemas: [CUSTOM_ELEMENTS_SCHEMA],
-    imports: [CacheDirective],
-    providers: [
+      schemas: [CUSTOM_ELEMENTS_SCHEMA],
+      imports: [TestComponent],
+      providers: [
         // CacheProvider,
         provideCacheProviderConfig(defaultConfigs),
         provideQuerySlices([
-            {
-                key: 'posts',
-                endpoint: '/posts',
-                method: 'POST',
-            },
+          {
+            key: 'posts',
+            endpoint: '/posts',
+            method: 'POST',
+          },
         ]),
         provideHttpClient(withInterceptorsFromDi()),
         provideHttpClientTesting(),
-    ]
-}).createComponent(TestComponent);
+      ],
+    }).createComponent(TestComponent);
     // Inject the http service and test controller for each test
     // httpClient = TestBed.inject(HttpClient);
     httpTestingController = TestBed.inject(HttpTestingController);

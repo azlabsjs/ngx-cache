@@ -19,12 +19,12 @@ import { templateFactory } from './helpers';
 @Directive({
   // eslint-disable-next-line @angular-eslint/directive-selector
   selector: '[azlCache]',
-  standalone: true
+  standalone: true,
 })
 export class CacheDirective implements AfterViewInit, OnDestroy {
   // #region Directive inputs
   @Input('azlCache') key!: string;
-  @Input() query!: string;
+  @Input() query!: string | number;
   @Input() search = 'id';
   @Input() template: string | string[] = 'label';
   // #endregion Directive inputs
@@ -56,7 +56,9 @@ export class CacheDirective implements AfterViewInit, OnDestroy {
         }),
         distinctUntilChanged(),
         // Case the text value is undefined, we append ... to indicate value is being loaded
-        tap((text) => text ? this.appendTextNode(String(text)) : this.appendTextNode('...'))
+        tap((text) =>
+          text ? this.appendTextNode(String(text)) : this.appendTextNode('...')
+        )
       )
       .subscribe();
     if (_subscription) {
@@ -76,7 +78,10 @@ export class CacheDirective implements AfterViewInit, OnDestroy {
       this.provider.loadSlice([
         {
           ...query,
-          params: { ...(query.params ?? {}), [this.search]: this.query },
+          params: {
+            ...(query.params ?? {}),
+            [this.search]: String(this.query),
+          },
         },
       ]);
     }

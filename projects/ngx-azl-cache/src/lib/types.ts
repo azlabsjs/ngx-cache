@@ -17,8 +17,7 @@ export type PaginationChunkReturnType = (
 ) => number[][];
 
 /**
- * Query object for selecting values from the
- * query data source at runtime
+ * Query object for selecting values from the query data source at runtime
  */
 export type SliceQueryType = (QueryConfigType | string)[];
 
@@ -62,9 +61,7 @@ export type CacheQueryProviderType = QueryProviderType<
   copy(): CacheQueryProviderType;
 };
 
-/**
- * @internal
- */
+/** @internal */
 export type ResponseInterceptorType = <T>(
   response: T
 ) => Record<string, unknown>[];
