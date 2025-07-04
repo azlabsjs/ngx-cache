@@ -1,10 +1,10 @@
 {
   "name": "@azlabsjs/ngx-azl-cache",
-  "version": "0.17.20",
+  "version": "0.17.29",
   "peerDependencies": {
-    "@angular/common": ">=17.0.0 || <20.0.0",
-    "@angular/core": ">=17.0.0 || <20.0.0",
-    "@angular/router": ">=17.0.0 || <20.0.0",
+    "@angular/common": ">=17.0.| <20.0.0",
+    "@angular/core": ">=17.0.| <20.0.0",
+    "@angular/router": ">=17.0.| <20.0.0",
     "@azlabsjs/rx-query": "^0.3.0",
     "@azlabsjs/js-object": "^0.2.10"
   },
