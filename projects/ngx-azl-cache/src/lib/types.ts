@@ -6,9 +6,10 @@ import {
 } from '@azlabsjs/rx-query';
 import { Observable } from 'rxjs';
 
-/**
- * @internal
- */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type UnknownType = any;
+
+/** @internal */
 export type PaginationChunkReturnType = (
   total: number,
   perPage: number,
@@ -73,7 +74,9 @@ export type ResponseInterceptorType = <T>(
  */
 export type ProviderConfigType = {
   debug?: boolean;
-  logger?: { log: (message: string, ...args: any) => void | Promise<void> };
+  logger?: {
+    log: (message: string, ...args: unknown[]) => void | Promise<void>;
+  };
   chunkSize?: number;
   queryInterval?: number;
   responseInterceptor?: ResponseInterceptorType;
@@ -142,14 +145,13 @@ export type PageResult<T = unknown> = {
   page?: number;
 };
 
-
 /** @internal */
 export type HttpClientType = {
-  request: (
+  request: <T = UnknownType>(
     method: string,
     url: string,
     options?: {
-      body?: any;
+      body?: UnknownType;
       headers?: {
         [header: string]: string | string[];
       };
@@ -170,7 +172,7 @@ export type HttpClientType = {
           }
         | boolean;
     }
-  ) => Observable<any>;
+  ) => Observable<T>;
 };
 
 /** @internal */

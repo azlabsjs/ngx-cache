@@ -2,7 +2,7 @@ import { CUSTOM_ELEMENTS_SCHEMA, Component, Input } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { CacheDirective } from './cache.directive';
 import { defaultConfigs } from './defaults';
-import { HttpClient, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { By } from '@angular/platform-browser';
 import { provideCacheProviderConfig, provideQuerySlices } from './providers';
@@ -37,8 +37,7 @@ const testData: Post[] = [
       [search]="'id'"
       [query]="query"
     ></p>
-  `,
-    standalone: false
+  `
 })
 export class TestComponent {
   @Input() query = 2;
