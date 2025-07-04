@@ -1,6 +1,6 @@
 {
   "name": "@azlabsjs/ngx-azl-cache",
-  "version": "0.17.2",
+  "version": "0.17.20",
   "peerDependencies": {
     "@angular/common": ">=17.0.0 || <20.0.0",
     "@angular/core": ">=17.0.0 || <20.0.0",
