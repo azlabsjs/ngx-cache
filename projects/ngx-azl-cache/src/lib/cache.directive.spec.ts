@@ -30,7 +30,7 @@ const testData: Post[] = [
 ];
 
 @Component({
-  template: `
+    template: `
     <p
       [azlCache]="'posts'"
       [template]="template"
@@ -38,6 +38,7 @@ const testData: Post[] = [
       [query]="query"
     ></p>
   `,
+    standalone: false
 })
 export class TestComponent {
   @Input() query = 2;
@@ -45,7 +46,7 @@ export class TestComponent {
 }
 
 describe('HttpClient testing', () => {
-  // let httpClient: HttpClient;
+  // let httpClient!: HttpClient;
   let httpTestingController: HttpTestingController;
   let fixture!: ComponentFixture<TestComponent>;
 
@@ -69,7 +70,7 @@ describe('HttpClient testing', () => {
     ]
 }).createComponent(TestComponent);
     // Inject the http service and test controller for each test
-    httpClient = TestBed.inject(HttpClient);
+    // httpClient = TestBed.inject(HttpClient);
     httpTestingController = TestBed.inject(HttpTestingController);
   });
 
