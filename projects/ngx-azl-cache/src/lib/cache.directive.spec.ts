@@ -2,11 +2,8 @@ import { CUSTOM_ELEMENTS_SCHEMA, Component, Input } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { CacheDirective } from './cache.directive';
 import { defaultConfigs } from './defaults';
-import { HttpClient } from '@angular/common/http';
-import {
-  HttpClientTestingModule,
-  HttpTestingController,
-} from '@angular/common/http/testing';
+import { HttpClient, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { By } from '@angular/platform-browser';
 import { provideCacheProviderConfig, provideQuerySlices } from './providers';
 
@@ -48,27 +45,29 @@ export class TestComponent {
 }
 
 describe('HttpClient testing', () => {
-  let httpClient: HttpClient;
+  // let httpClient: HttpClient;
   let httpTestingController: HttpTestingController;
   let fixture!: ComponentFixture<TestComponent>;
 
   beforeEach(() => {
     fixture = TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule, CacheDirective],
-      declarations: [TestComponent],
-      schemas: [CUSTOM_ELEMENTS_SCHEMA],
-      providers: [
+    declarations: [TestComponent],
+    schemas: [CUSTOM_ELEMENTS_SCHEMA],
+    imports: [CacheDirective],
+    providers: [
         // CacheProvider,
         provideCacheProviderConfig(defaultConfigs),
         provideQuerySlices([
-          {
-            key: 'posts',
-            endpoint: '/posts',
-            method: 'POST',
-          },
+            {
+                key: 'posts',
+                endpoint: '/posts',
+                method: 'POST',
+            },
         ]),
-      ],
-    }).createComponent(TestComponent);
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
+    ]
+}).createComponent(TestComponent);
     // Inject the http service and test controller for each test
     httpClient = TestBed.inject(HttpClient);
     httpTestingController = TestBed.inject(HttpTestingController);
